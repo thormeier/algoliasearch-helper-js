@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 var forEach = require('lodash/forEach');
@@ -13,7 +14,7 @@ var requestBuilder = {
    * @private
    * @return {object[]} The queries
    */
-  _getQueries: function getQueries(index, state) {
+  getQueries: function getQueries(index: string, state: Object) {
     var queries = [];
 
     // One query for the hits
@@ -26,7 +27,7 @@ var requestBuilder = {
     forEach(state.getRefinedDisjunctiveFacets(), function(refinedFacet) {
       queries.push({
         indexName: index,
-        params: requestBuilder._getDisjunctiveFacetSearchParams(state, refinedFacet)
+        params: requestBuilder._getDisjunctiveFacetSearchParams(state, refinedFacet, false)
       });
     });
 
@@ -54,7 +55,7 @@ var requestBuilder = {
    * @private
    * @return {object.<string, any>}
    */
-  _getHitsSearchParams: function(state) {
+  _getHitsSearchParams: function(state: Object) {
     var facets = state.facets
       .concat(state.disjunctiveFacets)
       .concat(requestBuilder._getHitsHierarchicalFacetsAttributes(state));
@@ -86,7 +87,7 @@ var requestBuilder = {
    * @param  {boolean} hierarchicalRootLevel ?? FIXME
    * @return {object}
    */
-  _getDisjunctiveFacetSearchParams: function(state, facet, hierarchicalRootLevel) {
+  _getDisjunctiveFacetSearchParams: function(state: Object, facet: string, hierarchicalRootLevel: boolean) {
     var facetFilters = requestBuilder._getFacetFilters(state, facet, hierarchicalRootLevel);
     var numericFilters = requestBuilder._getNumericFilters(state, facet);
     var tagFilters = requestBuilder._getTagFilters(state);
@@ -176,7 +177,7 @@ var requestBuilder = {
    * @param  {string} [facet] if set, the current disjunctive facet
    * @return {array.<string>}
    */
-  _getFacetFilters: function(state, facet, hierarchicalRootLevel) {
+  _getFacetFilters: function(state: Object, facet: string, hierarchicalRootLevel: boolean) {
     var facetFilters = [];
 
     forEach(state.facetsRefinements, function(facetValues, facetName) {
@@ -247,7 +248,7 @@ var requestBuilder = {
     return facetFilters;
   },
 
-  _getHitsHierarchicalFacetsAttributes: function(state) {
+  _getHitsHierarchicalFacetsAttributes: function(state: Object) {
     var out = [];
 
     return reduce(
@@ -270,7 +271,7 @@ var requestBuilder = {
       }, out);
   },
 
-  _getDisjunctiveHierarchicalFacetAttribute: function(state, hierarchicalFacet, rootLevel) {
+  _getDisjunctiveHierarchicalFacetAttribute: function(state: Object, hierarchicalFacet: Object, rootLevel: boolean) {
     var separator = state._getHierarchicalFacetSeparator(hierarchicalFacet);
     if (rootLevel === true) {
       var rootPath = state._getHierarchicalRootPath(hierarchicalFacet);
