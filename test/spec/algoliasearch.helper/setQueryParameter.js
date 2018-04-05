@@ -1,17 +1,15 @@
-'use strict';
+const test = require('tape');
+const algoliasearchHelper = require('../../../index');
 
-var test = require('tape');
-var algoliasearchHelper = require('../../../index');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('setChange should change the current state', function(t) {
-  var helper = algoliasearchHelper(fakeClient, null, null);
-  var changed = false;
+test('setChange should change the current state', t => {
+  const helper = algoliasearchHelper(fakeClient, null, null);
+  let changed = false;
 
-  helper.on('change', function() {
+  helper.on('change', () => {
     changed = true;
   });
 
@@ -24,12 +22,12 @@ test('setChange should change the current state', function(t) {
   t.end();
 });
 
-test('setChange should not change the current state: no real modification', function(t) {
-  var helper = algoliasearchHelper(fakeClient, null, null);
-  var changed = false;
-  var initialState = helper.state;
+test('setChange should not change the current state: no real modification', t => {
+  const helper = algoliasearchHelper(fakeClient, null, null);
+  let changed = false;
+  const initialState = helper.state;
 
-  helper.on('change', function() {
+  helper.on('change', () => {
     changed = true;
   });
 
@@ -38,7 +36,11 @@ test('setChange should not change the current state: no real modification', func
   helper.setQueryParameter('page', 0);
   t.equal(helper.getCurrentPage(), 0, 'After setting the page is 0');
   t.notOk(changed, 'Change event should not have been triggered');
-  t.equal(helper.state, initialState, 'The state instance should remain the same');
+  t.equal(
+    helper.state,
+    initialState,
+    'The state instance should remain the same'
+  );
 
   t.end();
 });

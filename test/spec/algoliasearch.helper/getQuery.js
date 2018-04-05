@@ -1,26 +1,24 @@
-'use strict';
+const test = require('tape');
+const algoliaSearchHelper = require('../../../index.js');
 
-var test = require('tape');
-var algoliaSearchHelper = require('../../../index.js');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('getQuery', function(t) {
-  var helper = algoliaSearchHelper(fakeClient, 'IndexName', {
+test('getQuery', t => {
+  const helper = algoliaSearchHelper(fakeClient, 'IndexName', {
     disjunctiveFacets: ['df1', 'df2', 'df3'],
     disjunctiveFacetsRefinements: {
       df1: ['DF1-VAL-1'],
-      df2: ['DF2-VAL-1', 'DF2-VAL-2']
+      df2: ['DF2-VAL-1', 'DF2-VAL-2'],
     },
     facets: ['facet1', 'facet2', 'facet3'],
     facetsRefinements: {
       facet1: ['FACET1-VAL-1'],
-      facet2: ['FACET2-VAL-1', 'FACET2-VAL2']
+      facet2: ['FACET2-VAL-1', 'FACET2-VAL2'],
     },
     minWordSizefor1Typo: 8,
-    ignorePlurals: true
+    ignorePlurals: true,
   });
 
   t.deepEqual(helper.getQuery(), {
@@ -30,12 +28,13 @@ test('getQuery', function(t) {
     ignorePlurals: true,
     facets: ['facet1', 'facet2', 'facet3', 'df1', 'df2', 'df3'],
     tagFilters: '',
-    facetFilters: ['facet1:FACET1-VAL-1',
+    facetFilters: [
+      'facet1:FACET1-VAL-1',
       'facet2:FACET2-VAL-1',
       'facet2:FACET2-VAL2',
       ['df1:DF1-VAL-1'],
-      ['df2:DF2-VAL-1', 'df2:DF2-VAL-2']
-    ]
+      ['df2:DF2-VAL-1', 'df2:DF2-VAL-2'],
+    ],
   });
 
   t.end();

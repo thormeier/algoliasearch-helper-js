@@ -1,34 +1,36 @@
-'use strict';
+const test = require('tape');
+const algoliasearchHelper = require('../../../index');
 
-var test = require('tape');
-var algoliasearchHelper = require('../../../index');
+const _ = require('lodash');
 
-var _ = require('lodash');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('helper.hasRefinements(attribute)', function(t) {
-  var helper;
+test('helper.hasRefinements(attribute)', t => {
+  let helper;
 
   // cannot be tested since there's no way to know that a numeric refinement
   // was once added then removed thus we always return false when not found
-  t.skip('undefined attribute', function(tt) {
+  t.skip('undefined attribute', tt => {
     setup();
-    tt.throws(_.partial(helper.hasRefinements, 'unknown'), Error, 'it throws when unknown attribute');
+    tt.throws(
+      _.partial(helper.hasRefinements, 'unknown'),
+      Error,
+      'it throws when unknown attribute'
+    );
     tt.end();
   });
 
-  t.test('numericRefinement', function(tt) {
-    tt.test('with refinement', function(ttt) {
+  t.test('numericRefinement', tt => {
+    tt.test('with refinement', ttt => {
       setup();
       helper.addNumericRefinement('price', '=', 1337);
       ttt.equal(helper.hasRefinements('price'), true);
       ttt.end();
     });
 
-    tt.test('without refinement', function(ttt) {
+    tt.test('without refinement', ttt => {
       setup();
       helper.addNumericRefinement('price', '=', 1337);
       helper.clearRefinements('price');
@@ -37,63 +39,67 @@ test('helper.hasRefinements(attribute)', function(t) {
     });
   });
 
-  t.test('facet', function(tt) {
-    tt.test('with refinement', function(ttt) {
+  t.test('facet', tt => {
+    tt.test('with refinement', ttt => {
       setup({
-        facets: ['color']
+        facets: ['color'],
       });
       helper.toggleFacetRefinement('color', 'red');
       ttt.equal(helper.hasRefinements('color'), true);
       ttt.end();
     });
 
-    tt.test('without refinement', function(ttt) {
+    tt.test('without refinement', ttt => {
       setup({
-        facets: ['color']
+        facets: ['color'],
       });
       ttt.equal(helper.hasRefinements('color'), false);
       ttt.end();
     });
   });
 
-  t.test('disjunctiveFacet', function(tt) {
-    tt.test('with refinement', function(ttt) {
+  t.test('disjunctiveFacet', tt => {
+    tt.test('with refinement', ttt => {
       setup({
-        disjunctiveFacets: ['author']
+        disjunctiveFacets: ['author'],
       });
       helper.toggleFacetRefinement('author', 'John Spartan');
       ttt.equal(helper.hasRefinements('author'), true);
       ttt.end();
     });
 
-    tt.test('without refinement', function(ttt) {
+    tt.test('without refinement', ttt => {
       setup({
-        disjunctiveFacets: ['author']
+        disjunctiveFacets: ['author'],
       });
       ttt.equal(helper.hasRefinements('author'), false);
       ttt.end();
     });
   });
 
-  t.test('hierarchicalFacet', function(tt) {
-    tt.test('with refinement', function(ttt) {
+  t.test('hierarchicalFacet', tt => {
+    tt.test('with refinement', ttt => {
       setup({
-        hierarchicalFacets: [{
-          name: 'category',
-          attributes: ['category.lvl0', 'category.lvl1']
-        }]
+        hierarchicalFacets: [
+          {
+            name: 'category',
+            attributes: ['category.lvl0', 'category.lvl1'],
+          },
+        ],
       });
       helper.toggleFacetRefinement('category', 'Action Movies > Max');
       ttt.equal(helper.hasRefinements('category'), true);
       ttt.end();
     });
 
-    tt.test('without refinement', function(ttt) {
+    tt.test('without refinement', ttt => {
       setup({
-        hierarchicalFacets: [{
-          name: 'category',
-          attributes: ['category.lvl0', 'category.lvl1']
-        }]
+        hierarchicalFacets: [
+          {
+            name: 'category',
+            attributes: ['category.lvl0', 'category.lvl1'],
+          },
+        ],
       });
       ttt.equal(helper.hasRefinements('category'), false);
       ttt.end();

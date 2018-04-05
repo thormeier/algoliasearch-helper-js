@@ -1,14 +1,12 @@
-'use strict';
+const test = require('tape');
+const forOwn = require('lodash/forOwn');
+const SearchParameters = require('../../../src/SearchParameters');
 
-var test = require('tape');
-var forOwn = require('lodash/forOwn');
-var SearchParameters = require('../../../src/SearchParameters');
-
-test('setQueryParameters should return the same instance if the options is falsey', function(t) {
-  var originalSP = new SearchParameters({
+test('setQueryParameters should return the same instance if the options is falsey', t => {
+  const originalSP = new SearchParameters({
     facets: ['a', 'b'],
     ignorePlurals: false,
-    attributesToHighlight: ''
+    attributesToHighlight: '',
   });
 
   t.equal(originalSP, originalSP.setQueryParameters());
@@ -18,43 +16,59 @@ test('setQueryParameters should return the same instance if the options is false
   t.end();
 });
 
-test('setQueryParameters should be able to mix an actual state with a new set of parameters', function(t) {
-  var originalSP = new SearchParameters({
+test('setQueryParameters should be able to mix an actual state with a new set of parameters', t => {
+  const originalSP = new SearchParameters({
     facets: ['a', 'b'],
     ignorePlurals: false,
-    attributesToHighlight: ''
+    attributesToHighlight: '',
   });
 
-  var params = {
+  const params = {
     facets: ['a', 'c'],
     attributesToHighlight: ['city', 'country'],
-    replaceSynonymsInHighlight: true
+    replaceSynonymsInHighlight: true,
   };
-  var newSP = originalSP.setQueryParameters(params);
+  const newSP = originalSP.setQueryParameters(params);
 
-  t.deepEquals(newSP.facets, params.facets, 'Facets should be updated (existing parameter)');
-  t.deepEquals(newSP.attributesToHighlight, newSP.attributesToHighlight, 'attributesToHighlight should be updated (existing parameter)');
-  t.equal(newSP.replaceSynonymsInHighlight, newSP.replaceSynonymsInHighlight, 'replaceSynonymsInHighlight should be updated (new parameter)');
-  t.equal(newSP.ignorePlurals, originalSP.ignorePlurals, 'ignorePlurals should be the same as the original');
+  t.deepEquals(
+    newSP.facets,
+    params.facets,
+    'Facets should be updated (existing parameter)'
+  );
+  t.deepEquals(
+    newSP.attributesToHighlight,
+    newSP.attributesToHighlight,
+    'attributesToHighlight should be updated (existing parameter)'
+  );
+  t.equal(
+    newSP.replaceSynonymsInHighlight,
+    newSP.replaceSynonymsInHighlight,
+    'replaceSynonymsInHighlight should be updated (new parameter)'
+  );
+  t.equal(
+    newSP.ignorePlurals,
+    originalSP.ignorePlurals,
+    'ignorePlurals should be the same as the original'
+  );
 
   t.end();
 });
 
-test('setQueryParameters should add unknown properties', function(t) {
-  var state0 = new SearchParameters({
+test('setQueryParameters should add unknown properties', t => {
+  const state0 = new SearchParameters({
     facets: ['a', 'b'],
     ignorePlurals: false,
-    attributesToHighlight: ''
+    attributesToHighlight: '',
   });
 
-  var params = {
+  const params = {
     unknow1: ['a', 'c'],
-    facet: ['city', 'country']
+    facet: ['city', 'country'],
   };
 
-  var state1 = state0.setQueryParameters(params);
+  const state1 = state0.setQueryParameters(params);
 
-  forOwn(params, function(v, k) {
+  forOwn(params, (v, k) => {
     t.deepEquals(state1[k], v);
   });
 

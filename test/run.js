@@ -1,12 +1,14 @@
-'use strict';
-
-var bulk = require('bulk-require');
-var test = require('tape');
-var algolia = require('algoliasearch');
+const bulk = require('bulk-require');
+const test = require('tape');
+const algolia = require('algoliasearch');
 
 bulk(__dirname, ['spec/**/*.js']);
 
-if (process.env.ONLY_UNIT !== 'true' && process.env.INTEGRATION_TEST_API_KEY && process.env.INTEGRATION_TEST_APPID) {
+if (
+  process.env.ONLY_UNIT !== 'true' &&
+  process.env.INTEGRATION_TEST_API_KEY &&
+  process.env.INTEGRATION_TEST_APPID
+) {
   // usage: INTEGRATION_TEST_APPID=$APPID INTEGRATION_TEST_API_KEY=$APIKEY npm run dev
   bulk(__dirname, ['integration-spec/**/*.js']);
 
@@ -15,8 +17,11 @@ if (process.env.ONLY_UNIT !== 'true' && process.env.INTEGRATION_TEST_API_KEY && 
 
 function cleanupIntegration() {
   console.log('Deleting all indices');
-  var client = algolia(process.env.INTEGRATION_TEST_APPID, process.env.INTEGRATION_TEST_API_KEY);
-  var maybeIndices = client.listIndexes();
+  const client = algolia(
+    process.env.INTEGRATION_TEST_APPID,
+    process.env.INTEGRATION_TEST_API_KEY
+  );
+  const maybeIndices = client.listIndexes();
   maybeIndices.then(content => {
     content.items
       .map(i => i.name)

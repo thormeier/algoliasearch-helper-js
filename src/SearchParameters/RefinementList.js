@@ -21,7 +21,7 @@ import filter from 'lodash/filter';
 import omit from 'lodash/omit';
 import indexOf from 'lodash/indexOf';
 
-var lib = {
+const RefinementList = {
   /**
    * Adds a refinement to a RefinementList
    * @param {RefinementList} refinementList the initial list
@@ -30,17 +30,17 @@ var lib = {
    * @return {RefinementList} a new and updated refinement list
    */
   addRefinement: function addRefinement(refinementList, attribute, value) {
-    if (lib.isRefined(refinementList, attribute, value)) {
+    if (RefinementList.isRefined(refinementList, attribute, value)) {
       return refinementList;
     }
 
-    var valueAsString = '' + value;
+    const valueAsString = `${value}`;
 
-    var facetRefinement = !refinementList[attribute] ?
-      [valueAsString] :
-      refinementList[attribute].concat(valueAsString);
+    const facetRefinement = !refinementList[attribute]
+      ? [valueAsString]
+      : refinementList[attribute].concat(valueAsString);
 
-    var mod = {};
+    const mod = {};
 
     mod[attribute] = facetRefinement;
 
@@ -55,16 +55,21 @@ var lib = {
    * @param {string} [value] the value of the refinement
    * @return {RefinementList} a new and updated refinement lst
    */
-  removeRefinement: function removeRefinement(refinementList, attribute, value) {
+  removeRefinement: function removeRefinement(
+    refinementList,
+    attribute,
+    value
+  ) {
     if (isUndefined(value)) {
-      return lib.clearRefinement(refinementList, attribute);
+      return RefinementList.clearRefinement(refinementList, attribute);
     }
 
-    var valueAsString = '' + value;
+    const valueAsString = `${value}`;
 
-    return lib.clearRefinement(refinementList, function(v, f) {
-      return attribute === f && valueAsString === v;
-    });
+    return RefinementList.clearRefinement(
+      refinementList,
+      (v, f) => attribute === f && valueAsString === v
+    );
   },
   /**
    * Toggles the refinement value for an attribute.
@@ -73,14 +78,19 @@ var lib = {
    * @param {string} value the value of the refinement
    * @return {RefinementList} a new and updated list
    */
-  toggleRefinement: function toggleRefinement(refinementList, attribute, value) {
-    if (isUndefined(value)) throw new Error('toggleRefinement should be used with a value');
+  toggleRefinement: function toggleRefinement(
+    refinementList,
+    attribute,
+    value
+  ) {
+    if (isUndefined(value))
+      throw new Error('toggleRefinement should be used with a value');
 
-    if (lib.isRefined(refinementList, attribute, value)) {
-      return lib.removeRefinement(refinementList, attribute, value);
+    if (RefinementList.isRefined(refinementList, attribute, value)) {
+      return RefinementList.removeRefinement(refinementList, attribute, value);
     }
 
-    return lib.addRefinement(refinementList, attribute, value);
+    return RefinementList.addRefinement(refinementList, attribute, value);
   },
   /**
    * Clear all or parts of a RefinementList. Depending on the arguments, three
@@ -93,7 +103,11 @@ var lib = {
    * @param {string} [refinementType] optional parameter to give more context to the attribute function
    * @return {RefinementList} a new and updated refinement list
    */
-  clearRefinement: function clearRefinement(refinementList, attribute, refinementType) {
+  clearRefinement: function clearRefinement(
+    refinementList,
+    attribute,
+    refinementType
+  ) {
     if (isUndefined(attribute)) {
       if (isEmpty(refinementList)) return refinementList;
       return {};
@@ -101,25 +115,30 @@ var lib = {
       if (isEmpty(refinementList[attribute])) return refinementList;
       return omit(refinementList, attribute);
     } else if (isFunction(attribute)) {
-      var hasChanged = false;
+      let hasChanged = false;
 
-      var newRefinementList = reduce(refinementList, function(memo, values, key) {
-        var facetList = filter(values, function(value) {
-          return !attribute(value, key, refinementType);
-        });
+      const newRefinementList = reduce(
+        refinementList,
+        (memo, values, key) => {
+          const facetList = filter(
+            values,
+            value => !attribute(value, key, refinementType)
+          );
 
-        if (!isEmpty(facetList)) {
-          if (facetList.length !== values.length) hasChanged = true;
-          memo[key] = facetList;
-        }
-        else hasChanged = true;
+          if (!isEmpty(facetList)) {
+            if (facetList.length !== values.length) hasChanged = true;
+            memo[key] = facetList; // eslint-disable-line no-param-reassign
+          } else hasChanged = true;
 
-        return memo;
-      }, {});
+          return memo;
+        },
+        {}
+      );
 
       if (hasChanged) return newRefinementList;
       return refinementList;
     }
+    return refinementList;
   },
   /**
    * Test if the refinement value is used for the attribute. If no refinement value
@@ -131,18 +150,18 @@ var lib = {
    * @return {boolean}
    */
   isRefined: function isRefined(refinementList, attribute, refinementValue) {
-
-    var containsRefinements = !!refinementList[attribute] &&
+    const containsRefinements =
+      Boolean(refinementList[attribute]) &&
       refinementList[attribute].length > 0;
 
     if (isUndefined(refinementValue) || !containsRefinements) {
       return containsRefinements;
     }
 
-    var refinementValueAsString = '' + refinementValue;
+    const refinementValueAsString = `${refinementValue}`;
 
     return indexOf(refinementList[attribute], refinementValueAsString) !== -1;
-  }
+  },
 };
 
-export default lib;
+export default RefinementList;

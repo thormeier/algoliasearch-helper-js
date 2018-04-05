@@ -1,42 +1,34 @@
-'use strict';
-
-var algoliasearch = require('algoliasearch');
+const algoliasearch = require('algoliasearch');
 
 function setup(indexName, fn) {
-  var appID = process.env.INTEGRATION_TEST_APPID;
-  var key = process.env.INTEGRATION_TEST_API_KEY;
+  const appID = process.env.INTEGRATION_TEST_APPID;
+  const key = process.env.INTEGRATION_TEST_API_KEY;
 
-  var client = algoliasearch(appID, key, {
+  const client = algoliasearch(appID, key, {
     // all indexing requests must be done in https
-    protocol: 'https:'
+    protocol: 'https:',
   });
-  var index = client.initIndex(indexName);
+  const index = client.initIndex(indexName);
 
   return index
     .clearIndex()
-    .then(function(content) {
-      return index.waitTask(content.taskID);
-    })
-    .then(function() {
-      return fn(client, index);
-    });
+    .then(content => index.waitTask(content.taskID))
+    .then(() => fn(client, index));
 }
 
 function withDatasetAndConfig(indexName, dataset, config) {
-  return setup(indexName, function(client, index) {
-    return index.addObjects(dataset).then(function() {
-      return index.setSettings(config);
-    }).then(function(content) {
-      return index.waitTask(content.taskID);
-    }).then(function() {
-      return client;
-    });
-  });
+  return setup(indexName, (client, index) =>
+    index
+      .addObjects(dataset)
+      .then(() => index.setSettings(config))
+      .then(content => index.waitTask(content.taskID))
+      .then(() => client)
+  );
 }
 
 // some environements are not able to do indexing requests using
 // PUT, like IE8 and IE9
-var shouldRun;
+let shouldRun;
 
 if (!process.browser) {
   shouldRun = true;
@@ -48,7 +40,7 @@ if (!process.browser) {
 
 module.exports = {
   isCIBrowser: process.browser && process.env.TRAVIS_BUILD_NUMBER,
-  setup: setup,
+  setup,
   setupSimple: withDatasetAndConfig,
-  shouldRun: shouldRun
+  shouldRun,
 };

@@ -1,27 +1,28 @@
-'use strict';
+const test = require('tape');
+const sinon = require('sinon');
+const algoliaSearch = require('algoliasearch');
 
-var test = require('tape');
-var sinon = require('sinon');
-var algoliaSearch = require('algoliasearch');
+const algoliasearchHelper = require('../../index');
 
-var algoliasearchHelper = require('../../index');
+test('Search should call the algolia client according to the number of refinements', t => {
+  const testData = require('./search.testdata.js')();
 
-test('Search should call the algolia client according to the number of refinements', function(t) {
-  var testData = require('./search.testdata.js')();
+  const client = algoliaSearch('dsf', 'dsfdf');
+  const mock = sinon.mock(client);
 
-  var client = algoliaSearch('dsf', 'dsfdf');
-  var mock = sinon.mock(client);
+  mock
+    .expects('search')
+    .once()
+    .resolves(testData.response);
 
-  mock.expects('search').once().resolves(testData.response);
-
-  var helper = algoliasearchHelper(client, 'test_hotels-node', {
-    disjunctiveFacets: ['city']
+  const helper = algoliasearchHelper(client, 'test_hotels-node', {
+    disjunctiveFacets: ['city'],
   });
 
   helper.addDisjunctiveRefine('city', 'Paris', true);
   helper.addDisjunctiveRefine('city', 'New York', true);
 
-  helper.on('result', function(data) {
+  helper.on('result', data => {
     // shame deepclone, to remove any associated methods coming from the results
     t.deepEqual(
       JSON.parse(JSON.stringify(data)),
@@ -29,46 +30,54 @@ test('Search should call the algolia client according to the number of refinemen
       'should be equal'
     );
 
-    var cityValues = data.getFacetValues('city');
-    var expectedCityValues = [
-      {name: 'Paris', count: 3, isRefined: true},
-      {name: 'New York', count: 1, isRefined: true},
-      {name: 'San Francisco', count: 1, isRefined: false}
+    const cityValues = data.getFacetValues('city');
+    const expectedCityValues = [
+      { name: 'Paris', count: 3, isRefined: true },
+      { name: 'New York', count: 1, isRefined: true },
+      { name: 'San Francisco', count: 1, isRefined: false },
     ];
 
     t.deepEqual(
       cityValues,
       expectedCityValues,
-      'Facet values for "city" should be correctly ordered using the default sort');
+      'Facet values for "city" should be correctly ordered using the default sort'
+    );
 
-    var cityValuesCustom = data.getFacetValues('city', {sortBy: ['count:asc', 'name:asc']});
-    var expectedCityValuesCustom = [
-      {name: 'New York', count: 1, isRefined: true},
-      {name: 'San Francisco', count: 1, isRefined: false},
-      {name: 'Paris', count: 3, isRefined: true}
+    const cityValuesCustom = data.getFacetValues('city', {
+      sortBy: ['count:asc', 'name:asc'],
+    });
+    const expectedCityValuesCustom = [
+      { name: 'New York', count: 1, isRefined: true },
+      { name: 'San Francisco', count: 1, isRefined: false },
+      { name: 'Paris', count: 3, isRefined: true },
     ];
-
 
     t.deepEqual(
       cityValuesCustom,
       expectedCityValuesCustom,
-      'Facet values for "city" should be correctly ordered using a custom sort');
+      'Facet values for "city" should be correctly ordered using a custom sort'
+    );
 
-    var cityValuesFn = data.getFacetValues('city', {sortBy: function(a, b) { return a.count - b.count; }});
-    var expectedCityValuesFn = [
-      {name: 'New York', count: 1, isRefined: true},
-      {name: 'San Francisco', count: 1, isRefined: false},
-      {name: 'Paris', count: 3, isRefined: true}
+    const cityValuesFn = data.getFacetValues('city', {
+      sortBy(a, b) {
+        return a.count - b.count;
+      },
+    });
+    const expectedCityValuesFn = [
+      { name: 'New York', count: 1, isRefined: true },
+      { name: 'San Francisco', count: 1, isRefined: false },
+      { name: 'Paris', count: 3, isRefined: true },
     ];
 
     t.deepEqual(
       cityValuesFn,
       expectedCityValuesFn,
-      'Facet values for "city" should be correctly ordered using a sort function');
+      'Facet values for "city" should be correctly ordered using a sort function'
+    );
 
-    var queries = mock.expectations.search[0].args[0][0];
-    for (var i = 0; i < queries.length; i++) {
-      var query = queries[i];
+    const queries = mock.expectations.search[0].args[0][0];
+    for (let i = 0; i < queries.length; i++) {
+      const query = queries[i];
       t.equal(query.query, undefined);
       t.equal(query.params.query, '');
     }
@@ -80,16 +89,16 @@ test('Search should call the algolia client according to the number of refinemen
   helper.search('');
 });
 
-test('no mutating methods should trigger a search', function(t) {
-  var client = algoliaSearch('dsf', 'dsfdf');
+test('no mutating methods should trigger a search', t => {
+  const client = algoliaSearch('dsf', 'dsfdf');
   sinon.mock(client);
 
-  var helper = algoliasearchHelper(client, 'Index', {
+  const helper = algoliasearchHelper(client, 'Index', {
     disjunctiveFacets: ['city'],
-    facets: ['tower']
+    facets: ['tower'],
   });
 
-  var stubbedSearch = sinon.stub(helper, '_search');
+  const stubbedSearch = sinon.stub(helper, '_search');
 
   helper.setQuery('');
   helper.clearRefinements();

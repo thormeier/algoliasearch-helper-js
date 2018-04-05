@@ -5,30 +5,42 @@ import isEmpty from 'lodash/isEmpty';
 import indexOf from 'lodash/indexOf';
 
 function filterState(state, filters) {
-  var partialState = {};
-  var attributeFilters = filter(filters, function(f) { return f.indexOf('attribute:') !== -1; });
-  var attributes = map(attributeFilters, function(aF) { return aF.split(':')[1]; });
+  const partialState = {};
+  const attributeFilters = filter(filters, f => f.indexOf('attribute:') !== -1);
+  const attributes = map(attributeFilters, aF => aF.split(':')[1]);
 
   if (indexOf(attributes, '*') === -1) {
-    forEach(attributes, function(attr) {
+    forEach(attributes, attr => {
       if (state.isConjunctiveFacet(attr) && state.isFacetRefined(attr)) {
-        if (!partialState.facetsRefinements) partialState.facetsRefinements = {};
+        if (!partialState.facetsRefinements)
+          partialState.facetsRefinements = {};
         partialState.facetsRefinements[attr] = state.facetsRefinements[attr];
       }
 
-      if (state.isDisjunctiveFacet(attr) && state.isDisjunctiveFacetRefined(attr)) {
-        if (!partialState.disjunctiveFacetsRefinements) partialState.disjunctiveFacetsRefinements = {};
-        partialState.disjunctiveFacetsRefinements[attr] = state.disjunctiveFacetsRefinements[attr];
+      if (
+        state.isDisjunctiveFacet(attr) &&
+        state.isDisjunctiveFacetRefined(attr)
+      ) {
+        if (!partialState.disjunctiveFacetsRefinements)
+          partialState.disjunctiveFacetsRefinements = {};
+        partialState.disjunctiveFacetsRefinements[attr] =
+          state.disjunctiveFacetsRefinements[attr];
       }
 
-      if (state.isHierarchicalFacet(attr) && state.isHierarchicalFacetRefined(attr)) {
-        if (!partialState.hierarchicalFacetsRefinements) partialState.hierarchicalFacetsRefinements = {};
-        partialState.hierarchicalFacetsRefinements[attr] = state.hierarchicalFacetsRefinements[attr];
+      if (
+        state.isHierarchicalFacet(attr) &&
+        state.isHierarchicalFacetRefined(attr)
+      ) {
+        if (!partialState.hierarchicalFacetsRefinements)
+          partialState.hierarchicalFacetsRefinements = {};
+        partialState.hierarchicalFacetsRefinements[attr] =
+          state.hierarchicalFacetsRefinements[attr];
       }
 
-      var numericRefinements = state.getNumericRefinements(attr);
+      const numericRefinements = state.getNumericRefinements(attr);
       if (!isEmpty(numericRefinements)) {
-        if (!partialState.numericRefinements) partialState.numericRefinements = {};
+        if (!partialState.numericRefinements)
+          partialState.numericRefinements = {};
         partialState.numericRefinements[attr] = state.numericRefinements[attr];
       }
     });
@@ -36,28 +48,23 @@ function filterState(state, filters) {
     if (!isEmpty(state.numericRefinements)) {
       partialState.numericRefinements = state.numericRefinements;
     }
-    if (!isEmpty(state.facetsRefinements)) partialState.facetsRefinements = state.facetsRefinements;
+    if (!isEmpty(state.facetsRefinements))
+      partialState.facetsRefinements = state.facetsRefinements;
     if (!isEmpty(state.disjunctiveFacetsRefinements)) {
-      partialState.disjunctiveFacetsRefinements = state.disjunctiveFacetsRefinements;
+      partialState.disjunctiveFacetsRefinements =
+        state.disjunctiveFacetsRefinements;
     }
     if (!isEmpty(state.hierarchicalFacetsRefinements)) {
-      partialState.hierarchicalFacetsRefinements = state.hierarchicalFacetsRefinements;
+      partialState.hierarchicalFacetsRefinements =
+        state.hierarchicalFacetsRefinements;
     }
   }
 
-  var searchParameters = filter(
-    filters,
-    function(f) {
-      return f.indexOf('attribute:') === -1;
-    }
-  );
+  const searchParameters = filter(filters, f => f.indexOf('attribute:') === -1);
 
-  forEach(
-    searchParameters,
-    function(parameterKey) {
-      partialState[parameterKey] = state[parameterKey];
-    }
-  );
+  forEach(searchParameters, parameterKey => {
+    partialState[parameterKey] = state[parameterKey];
+  });
 
   return partialState;
 }

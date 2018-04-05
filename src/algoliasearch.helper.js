@@ -1,3 +1,5 @@
+/* eslint-disable prefer-spread */
+
 import SearchParameters from './SearchParameters';
 import SearchResults from './SearchResults';
 import DerivedHelper from './DerivedHelper';
@@ -8,7 +10,7 @@ import flatten from 'lodash/flatten';
 import forEach from 'lodash/forEach';
 import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
-import url from './url';
+import * as url from './url';
 import version from './version';
 
 /**
@@ -114,11 +116,15 @@ import version from './version';
  * just an object containing the properties you need from it.
  */
 function AlgoliaSearchHelper(client, index, options) {
-  if (!client.addAlgoliaAgent) console.log('Please upgrade to the newest version of the JS Client.'); // eslint-disable-line
-  else if (!doesClientAgentContainsHelper(client)) client.addAlgoliaAgent('JS Helper ' + version);
+  if (!client.addAlgoliaAgent) {
+    // eslint-disable-next-line no-console
+    console.log('Please upgrade to the newest version of the JS Client.');
+  } else if (!doesClientAgentContainsHelper(client)) {
+    client.addAlgoliaAgent(`JS Helper ${version}`);
+  }
 
   this.setClient(client);
-  var opts = options || {};
+  const opts = options || {};
   opts.index = index;
   this.state = SearchParameters.make(opts);
   this.lastResults = null;
@@ -152,7 +158,7 @@ AlgoliaSearchHelper.prototype.search = function() {
  * @return {object} Query Parameters
  */
 AlgoliaSearchHelper.prototype.getQuery = function() {
-  var state = this.state;
+  const state = this.state;
   return requestBuilder._getHitsSearchParams(state);
 };
 
@@ -193,9 +199,10 @@ AlgoliaSearchHelper.prototype.getQuery = function() {
  * }
  */
 AlgoliaSearchHelper.prototype.searchOnce = function(options, cb) {
-  var tempState = !options ? this.state : this.state.setQueryParameters(options);
-  var queries = requestBuilder._getQueries(tempState.index, tempState);
-  var self = this;
+  const tempState = !options
+    ? this.state
+    : this.state.setQueryParameters(options);
+  const queries = requestBuilder._getQueries(tempState.index, tempState);
 
   this._currentNbQueries++;
 
@@ -204,18 +211,18 @@ AlgoliaSearchHelper.prototype.searchOnce = function(options, cb) {
   if (cb) {
     this.client
       .search(queries)
-      .then(function(content) {
-        self._currentNbQueries--;
-        if (self._currentNbQueries === 0) {
-          self.emit('searchQueueEmpty');
+      .then(content => {
+        this._currentNbQueries--;
+        if (this._currentNbQueries === 0) {
+          this.emit('searchQueueEmpty');
         }
 
         cb(null, new SearchResults(tempState, content.results), tempState);
       })
-      .catch(function(err) {
-        self._currentNbQueries--;
-        if (self._currentNbQueries === 0) {
-          self.emit('searchQueueEmpty');
+      .catch(err => {
+        this._currentNbQueries--;
+        if (this._currentNbQueries === 0) {
+          this.emit('searchQueueEmpty');
         }
 
         cb(err, null, tempState);
@@ -224,19 +231,22 @@ AlgoliaSearchHelper.prototype.searchOnce = function(options, cb) {
     return undefined;
   }
 
-  return this.client.search(queries).then(function(content) {
-    self._currentNbQueries--;
-    if (self._currentNbQueries === 0) self.emit('searchQueueEmpty');
-    return {
-      content: new SearchResults(tempState, content.results),
-      state: tempState,
-      _originalResponse: content
-    };
-  }, function(e) {
-    self._currentNbQueries--;
-    if (self._currentNbQueries === 0) self.emit('searchQueueEmpty');
-    throw e;
-  });
+  return this.client.search(queries).then(
+    content => {
+      this._currentNbQueries--;
+      if (this._currentNbQueries === 0) this.emit('searchQueueEmpty');
+      return {
+        content: new SearchResults(tempState, content.results),
+        state: tempState,
+        _originalResponse: content,
+      };
+    },
+    e => {
+      this._currentNbQueries--;
+      if (this._currentNbQueries === 0) this.emit('searchQueueEmpty');
+      throw e;
+    }
+  );
 };
 
 /**
@@ -273,31 +283,45 @@ AlgoliaSearchHelper.prototype.searchOnce = function(options, cb) {
  * it in the generated query.
  * @return {promise.<FacetSearchResult>} the results of the search
  */
-AlgoliaSearchHelper.prototype.searchForFacetValues = function(facet, query, maxFacetHits, userState) {
-  var state = this.state.setQueryParameters(userState || {});
-  var index = this.client.initIndex(state.index);
-  var isDisjunctive = state.isDisjunctiveFacet(facet);
-  var algoliaQuery = requestBuilder.getSearchForFacetQuery(facet, query, maxFacetHits, state);
+AlgoliaSearchHelper.prototype.searchForFacetValues = function(
+  facet,
+  query,
+  maxFacetHits,
+  userState
+) {
+  const state = this.state.setQueryParameters(userState || {});
+  const index = this.client.initIndex(state.index);
+  const isDisjunctive = state.isDisjunctiveFacet(facet);
+  const algoliaQuery = requestBuilder.getSearchForFacetQuery(
+    facet,
+    query,
+    maxFacetHits,
+    state
+  );
 
   this._currentNbQueries++;
-  var self = this;
 
   this.emit('searchForFacetValues', state, facet, query);
-  return index.searchForFacetValues(algoliaQuery).then(function addIsRefined(content) {
-    self._currentNbQueries--;
-    if (self._currentNbQueries === 0) self.emit('searchQueueEmpty');
-    content.facetHits = forEach(content.facetHits, function(f) {
-      f.isRefined = isDisjunctive ?
-        state.isDisjunctiveFacetRefined(facet, f.value) :
-        state.isFacetRefined(facet, f.value);
-    });
+  return index.searchForFacetValues(algoliaQuery).then(
+    content => {
+      this._currentNbQueries--;
+      if (this._currentNbQueries === 0) this.emit('searchQueueEmpty');
+      /* eslint-disable no-param-reassign */
+      content.facetHits = forEach(content.facetHits, f => {
+        f.isRefined = isDisjunctive
+          ? state.isDisjunctiveFacetRefined(facet, f.value)
+          : state.isFacetRefined(facet, f.value);
+      });
+      /* eslint-enable no-param-reassign*/
 
-    return content;
-  }, function(e) {
-    self._currentNbQueries--;
-    if (self._currentNbQueries === 0) self.emit('searchQueueEmpty');
-    throw e;
-  });
+      return content;
+    },
+    e => {
+      this._currentNbQueries--;
+      if (this._currentNbQueries === 0) this.emit('searchQueueEmpty');
+      throw e;
+    }
+  );
 };
 
 /**
@@ -366,8 +390,13 @@ AlgoliaSearchHelper.prototype.clearTags = function() {
  * @fires change
  * @chainable
  */
-AlgoliaSearchHelper.prototype.addDisjunctiveFacetRefinement = function(facet, value) {
-  this._change(this.state.setPage(0).addDisjunctiveFacetRefinement(facet, value));
+AlgoliaSearchHelper.prototype.addDisjunctiveFacetRefinement = function(
+  facet,
+  value
+) {
+  this._change(
+    this.state.setPage(0).addDisjunctiveFacetRefinement(facet, value)
+  );
   return this;
 };
 
@@ -391,8 +420,13 @@ AlgoliaSearchHelper.prototype.addDisjunctiveRefine = function() {
  * @chainable
  * @fires change
  */
-AlgoliaSearchHelper.prototype.addHierarchicalFacetRefinement = function(facet, value) {
-  this._change(this.state.setPage(0).addHierarchicalFacetRefinement(facet, value));
+AlgoliaSearchHelper.prototype.addHierarchicalFacetRefinement = function(
+  facet,
+  value
+) {
+  this._change(
+    this.state.setPage(0).addHierarchicalFacetRefinement(facet, value)
+  );
   return this;
 };
 
@@ -408,8 +442,14 @@ AlgoliaSearchHelper.prototype.addHierarchicalFacetRefinement = function(facet, v
  * @fires change
  * @chainable
  */
-AlgoliaSearchHelper.prototype.addNumericRefinement = function(attribute, operator, value) {
-  this._change(this.state.setPage(0).addNumericRefinement(attribute, operator, value));
+AlgoliaSearchHelper.prototype.addNumericRefinement = function(
+  attribute,
+  operator,
+  value
+) {
+  this._change(
+    this.state.setPage(0).addNumericRefinement(attribute, operator, value)
+  );
   return this;
 };
 
@@ -435,7 +475,6 @@ AlgoliaSearchHelper.prototype.addFacetRefinement = function(facet, value) {
 AlgoliaSearchHelper.prototype.addRefine = function() {
   return this.addFacetRefinement.apply(this, arguments);
 };
-
 
 /**
  * Adds a an exclusion filter to a faceted attribute with the `value` provided. If the
@@ -493,8 +532,14 @@ AlgoliaSearchHelper.prototype.addTag = function(tag) {
  * @fires change
  * @chainable
  */
-AlgoliaSearchHelper.prototype.removeNumericRefinement = function(attribute, operator, value) {
-  this._change(this.state.setPage(0).removeNumericRefinement(attribute, operator, value));
+AlgoliaSearchHelper.prototype.removeNumericRefinement = function(
+  attribute,
+  operator,
+  value
+) {
+  this._change(
+    this.state.setPage(0).removeNumericRefinement(attribute, operator, value)
+  );
   return this;
 };
 
@@ -512,8 +557,13 @@ AlgoliaSearchHelper.prototype.removeNumericRefinement = function(attribute, oper
  * @fires change
  * @chainable
  */
-AlgoliaSearchHelper.prototype.removeDisjunctiveFacetRefinement = function(facet, value) {
-  this._change(this.state.setPage(0).removeDisjunctiveFacetRefinement(facet, value));
+AlgoliaSearchHelper.prototype.removeDisjunctiveFacetRefinement = function(
+  facet,
+  value
+) {
+  this._change(
+    this.state.setPage(0).removeDisjunctiveFacetRefinement(facet, value)
+  );
   return this;
 };
 
@@ -532,7 +582,9 @@ AlgoliaSearchHelper.prototype.removeDisjunctiveRefine = function() {
  * @fires change
  * @chainable
  */
-AlgoliaSearchHelper.prototype.removeHierarchicalFacetRefinement = function(facet) {
+AlgoliaSearchHelper.prototype.removeHierarchicalFacetRefinement = function(
+  facet
+) {
   this._change(this.state.setPage(0).removeHierarchicalFacetRefinement(facet));
 
   return this;
@@ -617,7 +669,9 @@ AlgoliaSearchHelper.prototype.removeTag = function(tag) {
  * @chainable
  */
 AlgoliaSearchHelper.prototype.toggleFacetExclusion = function(facet, value) {
-  this._change(this.state.setPage(0).toggleExcludeFacetRefinement(facet, value));
+  this._change(
+    this.state.setPage(0).toggleExcludeFacetRefinement(facet, value)
+  );
   return this;
 };
 
@@ -826,9 +880,11 @@ AlgoliaSearchHelper.prototype.getState = function(filters) {
  *    won't be prefixed.
  * @return {string} the query string
  */
-AlgoliaSearchHelper.prototype.getStateAsQueryString = function getStateAsQueryString(options) {
-  var filters = options && options.filters || ['query', 'attribute:*'];
-  var partialState = this.getState(filters);
+AlgoliaSearchHelper.prototype.getStateAsQueryString = function getStateAsQueryString(
+  options
+) {
+  const filters = (options && options.filters) || ['query', 'attribute:*'];
+  const partialState = this.getState(filters);
 
   return url.getQueryStringFromState(partialState, options);
 };
@@ -846,7 +902,8 @@ AlgoliaSearchHelper.prototype.getStateAsQueryString = function getStateAsQuerySt
  * SearchParameters but not exhaustive)
  * @see {@link url#getStateFromQueryString}
  */
-AlgoliaSearchHelper.getConfigurationFromQueryString = url.getStateFromQueryString;
+AlgoliaSearchHelper.getConfigurationFromQueryString =
+  url.getStateFromQueryString;
 
 /**
  * DEPRECATED Retrieve an object of all the properties that are not understandable as helper
@@ -859,7 +916,8 @@ AlgoliaSearchHelper.getConfigurationFromQueryString = url.getStateFromQueryStrin
  * @return {object} the object containing the parsed configuration that doesn't
  * to the helper
  */
-AlgoliaSearchHelper.getForeignConfigurationInQueryString = url.getUnrecognizedParametersInQueryString;
+AlgoliaSearchHelper.getForeignConfigurationInQueryString =
+  url.getUnrecognizedParametersInQueryString;
 
 /**
  * DEPRECATED Overrides part of the state with the properties stored in the provided query
@@ -870,10 +928,13 @@ AlgoliaSearchHelper.getForeignConfigurationInQueryString = url.getUnrecognizedPa
  *  - prefix : prefix used for the algolia parameters
  *  - triggerChange : if set to true the state update will trigger a change event
  */
-AlgoliaSearchHelper.prototype.setStateFromQueryString = function(queryString, options) {
-  var triggerChange = options && options.triggerChange || false;
-  var configuration = url.getStateFromQueryString(queryString, options);
-  var updatedState = this.state.setQueryParameters(configuration);
+AlgoliaSearchHelper.prototype.setStateFromQueryString = function(
+  queryString,
+  options
+) {
+  const triggerChange = (options && options.triggerChange) || false;
+  const configuration = url.getStateFromQueryString(queryString, options);
+  const updatedState = this.state.setQueryParameters(configuration);
 
   if (triggerChange) this.setState(updatedState);
   else this.overrideStateWithoutTriggeringChangeEvent(updatedState);
@@ -896,7 +957,9 @@ AlgoliaSearchHelper.prototype.setStateFromQueryString = function(queryString, op
  *  }
  * @chainable
  */
-AlgoliaSearchHelper.prototype.overrideStateWithoutTriggeringChangeEvent = function(newState) {
+AlgoliaSearchHelper.prototype.overrideStateWithoutTriggeringChangeEvent = function(
+  newState
+) {
   this.state = new SearchParameters(newState);
   return this;
 };
@@ -911,9 +974,10 @@ AlgoliaSearchHelper.prototype.isRefined = function(facet, value) {
     return this.state.isDisjunctiveFacetRefined(facet, value);
   }
 
-  throw new Error(facet +
-    ' is not properly defined in this helper configuration' +
-    '(use the facets or disjunctiveFacets keys to configure it)');
+  throw new Error(
+    `${facet} is not properly defined in this helper configuration` +
+      `(use the facets or disjunctiveFacets keys to configure it)`
+  );
 };
 
 /**
@@ -964,7 +1028,7 @@ AlgoliaSearchHelper.prototype.hasRefinements = function(attribute) {
  *
  * @param  {string}  facet name of the attribute for used for faceting
  * @param  {string}  [value] optional value. If passed will test that this value
-   * is filtering the given facet.
+ * is filtering the given facet.
  * @return {boolean} true if refined
  * @example
  * helper.isExcludeRefined('color'); // false
@@ -1003,7 +1067,6 @@ AlgoliaSearchHelper.prototype.hasTag = function(tag) {
 AlgoliaSearchHelper.prototype.isTagRefined = function() {
   return this.hasTagRefinements.apply(this, arguments);
 };
-
 
 /**
  * Get the name of the currently used index.
@@ -1105,44 +1168,44 @@ AlgoliaSearchHelper.prototype.getQueryParameter = function(parameterName) {
  * // ]
  */
 AlgoliaSearchHelper.prototype.getRefinements = function(facetName) {
-  var refinements = [];
+  const refinements = [];
 
   if (this.state.isConjunctiveFacet(facetName)) {
-    var conjRefinements = this.state.getConjunctiveRefinements(facetName);
+    const conjRefinements = this.state.getConjunctiveRefinements(facetName);
 
-    forEach(conjRefinements, function(r) {
+    forEach(conjRefinements, r => {
       refinements.push({
         value: r,
-        type: 'conjunctive'
+        type: 'conjunctive',
       });
     });
 
-    var excludeRefinements = this.state.getExcludeRefinements(facetName);
+    const excludeRefinements = this.state.getExcludeRefinements(facetName);
 
-    forEach(excludeRefinements, function(r) {
+    forEach(excludeRefinements, r => {
       refinements.push({
         value: r,
-        type: 'exclude'
+        type: 'exclude',
       });
     });
   } else if (this.state.isDisjunctiveFacet(facetName)) {
-    var disjRefinements = this.state.getDisjunctiveRefinements(facetName);
+    const disjRefinements = this.state.getDisjunctiveRefinements(facetName);
 
-    forEach(disjRefinements, function(r) {
+    forEach(disjRefinements, r => {
       refinements.push({
         value: r,
-        type: 'disjunctive'
+        type: 'disjunctive',
       });
     });
   }
 
-  var numericRefinements = this.state.getNumericRefinements(facetName);
+  const numericRefinements = this.state.getNumericRefinements(facetName);
 
-  forEach(numericRefinements, function(value, operator) {
+  forEach(numericRefinements, (value, operator) => {
     refinements.push({
-      value: value,
-      operator: operator,
-      type: 'numeric'
+      value,
+      operator,
+      type: 'numeric',
     });
   });
 
@@ -1155,7 +1218,10 @@ AlgoliaSearchHelper.prototype.getRefinements = function(facetName) {
  * @param {string} operator operator applied on the refined values
  * @return {Array.<number|number[]>} refined values
  */
-AlgoliaSearchHelper.prototype.getNumericRefinement = function(attribute, operator) {
+AlgoliaSearchHelper.prototype.getNumericRefinement = function(
+  attribute,
+  operator
+) {
   return this.state.getNumericRefinement(attribute, operator);
 };
 
@@ -1164,7 +1230,9 @@ AlgoliaSearchHelper.prototype.getNumericRefinement = function(attribute, operato
  * @param  {string} facetName Hierarchical facet name
  * @return {array.<string>} the path as an array of string
  */
-AlgoliaSearchHelper.prototype.getHierarchicalFacetBreadcrumb = function(facetName) {
+AlgoliaSearchHelper.prototype.getHierarchicalFacetBreadcrumb = function(
+  facetName
+) {
   return this.state.getHierarchicalFacetBreadcrumb(facetName);
 };
 
@@ -1179,36 +1247,42 @@ AlgoliaSearchHelper.prototype.getHierarchicalFacetBreadcrumb = function(facetNam
  * @fires error
  */
 AlgoliaSearchHelper.prototype._search = function() {
-  var state = this.state;
-  var mainQueries = requestBuilder._getQueries(state.index, state);
+  const state = this.state;
+  const mainQueries = requestBuilder._getQueries(state.index, state);
 
-  var states = [{
-    state: state,
-    queriesCount: mainQueries.length,
-    helper: this
-  }];
+  const states = [
+    {
+      state,
+      queriesCount: mainQueries.length,
+      helper: this,
+    },
+  ];
 
   this.emit('search', state, this.lastResults);
 
-  var derivedQueries = map(this.derivedHelpers, function(derivedHelper) {
-    var derivedState = derivedHelper.getModifiedState(state);
-    var queries = requestBuilder._getQueries(derivedState.index, derivedState);
+  const derivedQueries = map(this.derivedHelpers, derivedHelper => {
+    const derivedState = derivedHelper.getModifiedState(state);
+    const queries = requestBuilder._getQueries(
+      derivedState.index,
+      derivedState
+    );
     states.push({
       state: derivedState,
       queriesCount: queries.length,
-      helper: derivedHelper
+      helper: derivedHelper,
     });
     derivedHelper.emit('search', derivedState, derivedHelper.lastResults);
     return queries;
   });
 
-  var queries = mainQueries.concat(flatten(derivedQueries));
-  var queryId = this._queryId++;
+  const queries = mainQueries.concat(flatten(derivedQueries));
+  const queryId = this._queryId++;
 
   this._currentNbQueries++;
 
   try {
-    this.client.search(queries)
+    this.client
+      .search(queries)
       .then(this._dispatchAlgoliaResponse.bind(this, states, queryId))
       .catch(this._dispatchAlgoliaError.bind(this, queryId));
   } catch (err) {
@@ -1228,7 +1302,11 @@ AlgoliaSearchHelper.prototype._search = function() {
  * @param {object} content content of the response
  * @return {undefined}
  */
-AlgoliaSearchHelper.prototype._dispatchAlgoliaResponse = function(states, queryId, content) {
+AlgoliaSearchHelper.prototype._dispatchAlgoliaResponse = function(
+  states,
+  queryId,
+  content
+) {
   // FIXME remove the number of outdated queries discarded instead of just one
 
   if (queryId < this._lastQueryIdReceived) {
@@ -1236,19 +1314,20 @@ AlgoliaSearchHelper.prototype._dispatchAlgoliaResponse = function(states, queryI
     return;
   }
 
-  this._currentNbQueries -= (queryId - this._lastQueryIdReceived);
+  this._currentNbQueries -= queryId - this._lastQueryIdReceived;
   this._lastQueryIdReceived = queryId;
 
   if (this._currentNbQueries === 0) this.emit('searchQueueEmpty');
 
-  var results = content.results;
-  forEach(states, function(s) {
-    var state = s.state;
-    var queriesCount = s.queriesCount;
-    var helper = s.helper;
-    var specificResults = results.splice(0, queriesCount);
+  const results = content.results;
+  forEach(states, s => {
+    const state = s.state;
+    const queriesCount = s.queriesCount;
+    const helper = s.helper;
+    const specificResults = results.splice(0, queriesCount);
 
-    var formattedResponse = helper.lastResults = new SearchResults(state, specificResults);
+    helper.lastResults = new SearchResults(state, specificResults);
+    const formattedResponse = helper.lastResults;
     helper.emit('result', formattedResponse, state);
   });
 };
@@ -1267,11 +1346,18 @@ AlgoliaSearchHelper.prototype._dispatchAlgoliaError = function(queryId, err) {
   if (this._currentNbQueries === 0) this.emit('searchQueueEmpty');
 };
 
-AlgoliaSearchHelper.prototype.containsRefinement = function(query, facetFilters, numericFilters, tagFilters) {
-  return query ||
+AlgoliaSearchHelper.prototype.containsRefinement = function(
+  query,
+  facetFilters,
+  numericFilters,
+  tagFilters
+) {
+  return (
+    query ||
     facetFilters.length !== 0 ||
     numericFilters.length !== 0 ||
-    tagFilters.length !== 0;
+    tagFilters.length !== 0
+  );
 };
 
 /**
@@ -1281,8 +1367,10 @@ AlgoliaSearchHelper.prototype.containsRefinement = function(query, facetFilters,
  * @return {boolean}
  */
 AlgoliaSearchHelper.prototype._hasDisjunctiveRefinements = function(facet) {
-  return this.state.disjunctiveRefinements[facet] &&
-    this.state.disjunctiveRefinements[facet].length > 0;
+  return (
+    this.state.disjunctiveRefinements[facet] &&
+    this.state.disjunctiveRefinements[facet].length > 0
+  );
 };
 
 AlgoliaSearchHelper.prototype._change = function(newState) {
@@ -1310,7 +1398,8 @@ AlgoliaSearchHelper.prototype.clearCache = function() {
 AlgoliaSearchHelper.prototype.setClient = function(newClient) {
   if (this.client === newClient) return this;
 
-  if (newClient.addAlgoliaAgent && !doesClientAgentContainsHelper(newClient)) newClient.addAlgoliaAgent('JS Helper ' + version);
+  if (newClient.addAlgoliaAgent && !doesClientAgentContainsHelper(newClient))
+    newClient.addAlgoliaAgent(`JS Helper ${version}`);
   this.client = newClient;
 
   return this;
@@ -1344,7 +1433,7 @@ AlgoliaSearchHelper.prototype.getClient = function() {
  * @return {DerivedHelper}
  */
 AlgoliaSearchHelper.prototype.derive = function(fn) {
-  var derivedHelper = new DerivedHelper(this, fn);
+  const derivedHelper = new DerivedHelper(this, fn);
   this.derivedHelpers.push(derivedHelper);
   return derivedHelper;
 };
@@ -1357,7 +1446,7 @@ AlgoliaSearchHelper.prototype.derive = function(fn) {
  * @throws Error
  */
 AlgoliaSearchHelper.prototype.detachDerivedHelper = function(derivedHelper) {
-  var pos = this.derivedHelpers.indexOf(derivedHelper);
+  const pos = this.derivedHelpers.indexOf(derivedHelper);
   if (pos === -1) throw new Error('Derived helper already detached');
   this.derivedHelpers.splice(pos, 1);
 };
@@ -1386,16 +1475,14 @@ AlgoliaSearchHelper.prototype.hasPendingRequests = function() {
  * @property {string} type the type of filter: 'conjunctive', 'disjunctive', 'exclude'
  */
 
-
 /*
  * This function tests if the _ua parameter of the client
  * already contains the JS Helper UA
  */
 function doesClientAgentContainsHelper(client) {
   // this relies on JS Client internal variable, this might break if implementation changes
-  var currentAgent = client._ua;
-  return !currentAgent ? false :
-    currentAgent.indexOf('JS Helper') !== -1;
+  const currentAgent = client._ua;
+  return !currentAgent ? false : currentAgent.indexOf('JS Helper') !== -1;
 }
 
 export default AlgoliaSearchHelper;

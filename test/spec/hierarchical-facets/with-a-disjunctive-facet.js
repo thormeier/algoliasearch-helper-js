@@ -1,34 +1,34 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+test('hierarchical facets: combined with a disjunctive facet', t => {
+  const algoliasearch = require('algoliasearch');
+  const sinon = require('sinon');
 
-test('hierarchical facets: combined with a disjunctive facet', function(t) {
-  var algoliasearch = require('algoliasearch');
-  var sinon = require('sinon');
+  const algoliasearchHelper = require('../../../');
 
-  var algoliasearchHelper = require('../../../');
+  const appId = 'hierarchical-simple-appId';
+  const apiKey = 'hierarchical-simple-apiKey';
+  const indexName = 'hierarchical-simple-indexName';
 
-  var appId = 'hierarchical-simple-appId';
-  var apiKey = 'hierarchical-simple-apiKey';
-  var indexName = 'hierarchical-simple-indexName';
-
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
     disjunctiveFacets: ['colors'],
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2']
-    }]
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2'],
+      },
+    ],
   });
 
   helper.toggleRefine('categories', 'beers > IPA');
   helper.toggleRefine('colors', 'blue');
 
-  client.search = sinon.stub().returns(new Promise(function() {}));
+  client.search = sinon.stub().returns(new Promise(() => {}));
 
   helper.setQuery('a').search();
 
-  var disjunctiveFacetsValuesQuery = client.search.getCall(0).args[0][1];
+  const disjunctiveFacetsValuesQuery = client.search.getCall(0).args[0][1];
 
   t.deepEqual(
     disjunctiveFacetsValuesQuery.params.facetFilters,

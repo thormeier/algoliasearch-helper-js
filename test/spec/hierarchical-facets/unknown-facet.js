@@ -1,23 +1,23 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+test('hierarchical facets: throw on unknown facet', t => {
+  const bind = require('lodash/bind');
+  const algoliasearch = require('algoliasearch');
 
-test('hierarchical facets: throw on unknown facet', function(t) {
-  var bind = require('lodash/bind');
-  var algoliasearch = require('algoliasearch');
+  const algoliasearchHelper = require('../../../');
 
-  var algoliasearchHelper = require('../../../');
+  const appId = 'hierarchical-throw-appId';
+  const apiKey = 'hierarchical-throw-apiKey';
+  const indexName = 'hierarchical-throw-indexName';
 
-  var appId = 'hierarchical-throw-appId';
-  var apiKey = 'hierarchical-throw-apiKey';
-  var indexName = 'hierarchical-throw-indexName';
-
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0']
-    }]
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: ['categories.lvl0'],
+      },
+    ],
   });
 
   t.throws(

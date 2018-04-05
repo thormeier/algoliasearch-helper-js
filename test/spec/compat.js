@@ -1,11 +1,9 @@
-'use strict';
+const test = require('tape');
+const algoliaSearchHelper = require('../../index');
+const url = algoliaSearchHelper.url;
+const AlgoliaSearchHelper = algoliaSearchHelper.AlgoliaSearchHelper;
 
-var test = require('tape');
-var algoliaSearchHelper = require('../../index');
-var url = algoliaSearchHelper.url;
-var AlgoliaSearchHelper = algoliaSearchHelper.AlgoliaSearchHelper;
-
-test('Should be compatible', function(t) {
+test('Should be compatible', t => {
   t.equal(
     AlgoliaSearchHelper.getConfigurationFromQueryString,
     url.getStateFromQueryString

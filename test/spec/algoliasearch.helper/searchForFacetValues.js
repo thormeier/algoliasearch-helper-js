@@ -1,28 +1,25 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+const algoliasearchHelper = require('../../../index');
 
-var algoliasearchHelper = require('../../../index');
-
-test('searchForFacetValues should search for facetValues with the current state', function(t) {
-  var lastParameters = null;
-  var fakeClient = {
-    addAlgoliaAgent: function() {},
-    initIndex: function() {
+test('searchForFacetValues should search for facetValues with the current state', t => {
+  let lastParameters = null;
+  const fakeClient = {
+    addAlgoliaAgent() {},
+    initIndex() {
       return {
-        searchForFacetValues: function() {
+        searchForFacetValues() {
           lastParameters = arguments;
-          return Promise.resolve({
-          });
-        }
+          return Promise.resolve({});
+        },
       };
-    }
+    },
   };
 
-  var helper = algoliasearchHelper(fakeClient, 'index', {
+  const helper = algoliasearchHelper(fakeClient, 'index', {
     highlightPreTag: 'HIGHLIGHT>',
     highlightPostTag: '<HIGHLIGHT',
-    query: 'iphone'
+    query: 'iphone',
   });
 
   helper.searchForFacetValues('facet', 'query', 75);
@@ -36,30 +33,29 @@ test('searchForFacetValues should search for facetValues with the current state'
   t.end();
 });
 
-test('searchForFacetValues can override the current search state', function(t) {
-  var lastParameters = null;
-  var fakeClient = {
-    addAlgoliaAgent: function() {},
-    initIndex: function() {
+test('searchForFacetValues can override the current search state', t => {
+  let lastParameters = null;
+  const fakeClient = {
+    addAlgoliaAgent() {},
+    initIndex() {
       return {
-        searchForFacetValues: function() {
+        searchForFacetValues() {
           lastParameters = arguments;
-          return Promise.resolve({
-          });
-        }
+          return Promise.resolve({});
+        },
       };
-    }
+    },
   };
 
-  var helper = algoliasearchHelper(fakeClient, 'index', {
+  const helper = algoliasearchHelper(fakeClient, 'index', {
     highlightPreTag: 'HIGHLIGHT>',
     highlightPostTag: '<HIGHLIGHT',
-    query: 'iphone'
+    query: 'iphone',
   });
 
   helper.searchForFacetValues('facet', 'query', 75, {
     query: undefined,
-    highlightPreTag: 'highlightTag'
+    highlightPreTag: 'highlightTag',
   });
 
   t.notOk(lastParameters[0].hasOwnProperty('query'));

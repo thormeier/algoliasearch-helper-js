@@ -1,19 +1,17 @@
-'use strict';
+const test = require('tape');
+const algoliaSearchHelper = require('../../../index.js');
 
-var test = require('tape');
-var algoliaSearchHelper = require('../../../index.js');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('getQueryParameter', function(t) {
-  var bind = require('lodash/bind');
+test('getQueryParameter', t => {
+  const bind = require('lodash/bind');
 
-  var helper = algoliaSearchHelper(fakeClient, null, {
+  const helper = algoliaSearchHelper(fakeClient, null, {
     facets: ['facet1'],
     minWordSizefor1Typo: 8,
-    ignorePlurals: true
+    ignorePlurals: true,
   });
 
   t.deepEqual(helper.getQueryParameter('facets'), ['facet1']);

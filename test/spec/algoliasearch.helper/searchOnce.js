@@ -1,30 +1,31 @@
-'use strict';
+const test = require('tape');
+const sinon = require('sinon');
+const algoliaSearch = require('algoliasearch');
+const SearchParameters = require('../../../src/SearchParameters');
 
-var test = require('tape');
-var sinon = require('sinon');
-var algoliaSearch = require('algoliasearch');
-var SearchParameters = require('../../../src/SearchParameters');
+const algoliasearchHelper = require('../../../index');
 
-var algoliasearchHelper = require('../../../index');
+test('searchOnce should call the algolia client according to the number of refinements and call callback with no error and with results when no error', t => {
+  const testData = require('../search.testdata')();
 
-test('searchOnce should call the algolia client according to the number of refinements and call callback with no error and with results when no error', function(t) {
-  var testData = require('../search.testdata')();
+  const client = algoliaSearch('dsf', 'dsfdf');
+  const mock = sinon.mock(client);
 
-  var client = algoliaSearch('dsf', 'dsfdf');
-  var mock = sinon.mock(client);
+  mock
+    .expects('search')
+    .once()
+    .resolves(testData.response);
 
-  mock.expects('search').once().resolves(testData.response);
+  const helper = algoliasearchHelper(client, 'test_hotels-node');
 
-  var helper = algoliasearchHelper(client, 'test_hotels-node');
-
-  var parameters = new SearchParameters({
-    disjunctiveFacets: ['city']
+  const parameters = new SearchParameters({
+    disjunctiveFacets: ['city'],
   })
     .setIndex('test_hotels-node')
     .addDisjunctiveFacetRefinement('city', 'Paris')
     .addDisjunctiveFacetRefinement('city', 'New York');
 
-  helper.searchOnce(parameters, function(err, data) {
+  helper.searchOnce(parameters, (err, data) => {
     t.equal(err, null, 'should be equal');
 
     // shame deepclone, to remove any associated methods coming from the results
@@ -34,11 +35,11 @@ test('searchOnce should call the algolia client according to the number of refin
       'should be equal'
     );
 
-    var cityValues = data.getFacetValues('city');
-    var expectedCityValues = [
-      {name: 'Paris', count: 3, isRefined: true},
-      {name: 'New York', count: 1, isRefined: true},
-      {name: 'San Francisco', count: 1, isRefined: false}
+    const cityValues = data.getFacetValues('city');
+    const expectedCityValues = [
+      { name: 'Paris', count: 3, isRefined: true },
+      { name: 'New York', count: 1, isRefined: true },
+      { name: 'San Francisco', count: 1, isRefined: false },
     ];
 
     t.deepEqual(
@@ -47,11 +48,13 @@ test('searchOnce should call the algolia client according to the number of refin
       'Facet values for "city" should be correctly ordered using the default sort'
     );
 
-    var cityValuesCustom = data.getFacetValues('city', {sortBy: ['count:asc', 'name:asc']});
-    var expectedCityValuesCustom = [
-      {name: 'New York', count: 1, isRefined: true},
-      {name: 'San Francisco', count: 1, isRefined: false},
-      {name: 'Paris', count: 3, isRefined: true}
+    const cityValuesCustom = data.getFacetValues('city', {
+      sortBy: ['count:asc', 'name:asc'],
+    });
+    const expectedCityValuesCustom = [
+      { name: 'New York', count: 1, isRefined: true },
+      { name: 'San Francisco', count: 1, isRefined: false },
+      { name: 'Paris', count: 3, isRefined: true },
     ];
 
     t.deepEqual(
@@ -60,11 +63,15 @@ test('searchOnce should call the algolia client according to the number of refin
       'Facet values for "city" should be correctly ordered using a custom sort'
     );
 
-    var cityValuesFn = data.getFacetValues('city', {sortBy: function(a, b) { return a.count - b.count; }});
-    var expectedCityValuesFn = [
-      {name: 'New York', count: 1, isRefined: true},
-      {name: 'San Francisco', count: 1, isRefined: false},
-      {name: 'Paris', count: 3, isRefined: true}
+    const cityValuesFn = data.getFacetValues('city', {
+      sortBy(a, b) {
+        return a.count - b.count;
+      },
+    });
+    const expectedCityValuesFn = [
+      { name: 'New York', count: 1, isRefined: true },
+      { name: 'San Francisco', count: 1, isRefined: false },
+      { name: 'Paris', count: 3, isRefined: true },
     ];
 
     t.deepEqual(
@@ -73,9 +80,9 @@ test('searchOnce should call the algolia client according to the number of refin
       'Facet values for "city" should be correctly ordered using a sort function'
     );
 
-    var queries = mock.expectations.search[0].args[0][0];
-    for (var i = 0; i < queries.length; i++) {
-      var query = queries[i];
+    const queries = mock.expectations.search[0].args[0][0];
+    for (let i = 0; i < queries.length; i++) {
+      const query = queries[i];
       t.equal(query.query, undefined);
       t.equal(query.params.query, '');
     }
@@ -85,29 +92,32 @@ test('searchOnce should call the algolia client according to the number of refin
   });
 });
 
-test('searchOnce should call the algolia client according to the number of refinements and call callback with error and no results when error', function(t) {
-  var client = algoliaSearch('dsf', 'dsfdf');
-  var mock = sinon.mock(client);
+test('searchOnce should call the algolia client according to the number of refinements and call callback with error and no results when error', t => {
+  const client = algoliaSearch('dsf', 'dsfdf');
+  const mock = sinon.mock(client);
 
-  var error = {message: 'error'};
-  mock.expects('search').once().rejects(error);
+  const error = { message: 'error' };
+  mock
+    .expects('search')
+    .once()
+    .rejects(error);
 
-  var helper = algoliasearchHelper(client, 'test_hotels-node');
+  const helper = algoliasearchHelper(client, 'test_hotels-node');
 
-  var parameters = new SearchParameters({
-    disjunctiveFacets: ['city']
+  const parameters = new SearchParameters({
+    disjunctiveFacets: ['city'],
   })
     .setIndex('test_hotels-node')
     .addDisjunctiveFacetRefinement('city', 'Paris')
     .addDisjunctiveFacetRefinement('city', 'New York');
 
-  helper.searchOnce(parameters, function(err, data) {
+  helper.searchOnce(parameters, (err, data) => {
     t.equal(err, error, 'should be equal');
     t.equal(data, null, 'should be equal');
 
-    var queries = mock.expectations.search[0].args[0][0];
-    for (var i = 0; i < queries.length; i++) {
-      var query = queries[i];
+    const queries = mock.expectations.search[0].args[0][0];
+    for (let i = 0; i < queries.length; i++) {
+      const query = queries[i];
       t.equal(query.query, undefined);
       t.equal(query.params.query, '');
     }

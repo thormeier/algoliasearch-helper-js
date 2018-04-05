@@ -1,9 +1,7 @@
-'use strict';
-
-var AlgoliaSearchHelper = require('./src/algoliasearch.helper');
-
-var SearchParameters = require('./src/SearchParameters');
-var SearchResults = require('./src/SearchResults');
+import AlgoliaSearchHelper from './src/algoliasearch.helper';
+import SearchParameters from './src/SearchParameters';
+import SearchResults from './src/SearchResults';
+import * as url from './src/url';
 
 /**
  * The algoliasearchHelper module is the function that will let its
@@ -74,6 +72,6 @@ algoliasearchHelper.SearchResults = SearchResults;
  * @type {object} {@link url}
  *
  */
-algoliasearchHelper.url = require('./src/url');
+algoliasearchHelper.url = url;
 
-module.exports = algoliasearchHelper;
+export default algoliasearchHelper;

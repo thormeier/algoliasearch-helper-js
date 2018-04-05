@@ -1,26 +1,31 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+test('hierarchical facets: toggleRefine behavior', t => {
+  const algoliasearch = require('algoliasearch');
+  const sinon = require('sinon');
 
-test('hierarchical facets: toggleRefine behavior', function(t) {
-  var algoliasearch = require('algoliasearch');
-  var sinon = require('sinon');
+  const algoliasearchHelper = require('../../../');
 
-  var algoliasearchHelper = require('../../../');
+  const appId = 'hierarchical-toggleRefine-appId';
+  const apiKey = 'hierarchical-toggleRefine-apiKey';
+  const indexName = 'hierarchical-toggleRefine-indexName';
 
-  var appId = 'hierarchical-toggleRefine-appId';
-  var apiKey = 'hierarchical-toggleRefine-apiKey';
-  var indexName = 'hierarchical-toggleRefine-indexName';
-
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2', 'categories.lvl3']
-    }]
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: [
+          'categories.lvl0',
+          'categories.lvl1',
+          'categories.lvl2',
+          'categories.lvl3',
+        ],
+      },
+    ],
   });
 
-  client.search = sinon.stub().returns(new Promise(function() {}));
+  client.search = sinon.stub().returns(new Promise(() => {}));
 
   // select `Flying dog`
   helper.toggleRefine('categories', 'beers > IPA > Flying dog');
@@ -34,9 +39,9 @@ test('hierarchical facets: toggleRefine behavior', function(t) {
 
   helper.setQuery('a').search();
 
-  var call = client.search.getCall(0);
-  var queries = call.args[0];
-  var hitsQuery = queries[0];
+  const call = client.search.getCall(0);
+  const queries = call.args[0];
+  const hitsQuery = queries[0];
 
   t.deepEqual(
     hitsQuery.params.facets,
@@ -51,25 +56,32 @@ test('hierarchical facets: toggleRefine behavior', function(t) {
   t.end();
 });
 
-test('hierarchical facets: toggleRefine behavior when root level', function(t) {
-  var algoliasearch = require('algoliasearch');
-  var sinon = require('sinon');
+test('hierarchical facets: toggleRefine behavior when root level', t => {
+  const algoliasearch = require('algoliasearch');
+  const sinon = require('sinon');
 
-  var algoliasearchHelper = require('../../../');
+  const algoliasearchHelper = require('../../../');
 
-  var appId = 'hierarchical-toggleRefine-appId';
-  var apiKey = 'hierarchical-toggleRefine-apiKey';
-  var indexName = 'hierarchical-toggleRefine-indexName';
+  const appId = 'hierarchical-toggleRefine-appId';
+  const apiKey = 'hierarchical-toggleRefine-apiKey';
+  const indexName = 'hierarchical-toggleRefine-indexName';
 
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2', 'categories.lvl3']
-    }]
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: [
+          'categories.lvl0',
+          'categories.lvl1',
+          'categories.lvl2',
+          'categories.lvl3',
+        ],
+      },
+    ],
   });
 
-  client.search = sinon.stub().returns(new Promise(function() {}));
+  client.search = sinon.stub().returns(new Promise(() => {}));
 
   helper.toggleRefine('categories', 'beers > IPA > Flying dog');
   helper.toggleRefine('categories', 'beers');
@@ -77,9 +89,9 @@ test('hierarchical facets: toggleRefine behavior when root level', function(t) {
 
   helper.setQuery('a').search();
 
-  var call = client.search.getCall(0);
-  var queries = call.args[0];
-  var hitsQuery = queries[0];
+  const call = client.search.getCall(0);
+  const queries = call.args[0];
+  const hitsQuery = queries[0];
 
   t.deepEqual(
     hitsQuery.params.facets,
@@ -94,25 +106,32 @@ test('hierarchical facets: toggleRefine behavior when root level', function(t) {
   t.end();
 });
 
-test('hierarchical facets: toggleRefine behavior when different root level', function(t) {
-  var algoliasearch = require('algoliasearch');
-  var sinon = require('sinon');
+test('hierarchical facets: toggleRefine behavior when different root level', t => {
+  const algoliasearch = require('algoliasearch');
+  const sinon = require('sinon');
 
-  var algoliasearchHelper = require('../../../');
+  const algoliasearchHelper = require('../../../');
 
-  var appId = 'hierarchical-toggleRefine-appId';
-  var apiKey = 'hierarchical-toggleRefine-apiKey';
-  var indexName = 'hierarchical-toggleRefine-indexName';
+  const appId = 'hierarchical-toggleRefine-appId';
+  const apiKey = 'hierarchical-toggleRefine-apiKey';
+  const indexName = 'hierarchical-toggleRefine-indexName';
 
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2', 'categories.lvl3']
-    }]
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: [
+          'categories.lvl0',
+          'categories.lvl1',
+          'categories.lvl2',
+          'categories.lvl3',
+        ],
+      },
+    ],
   });
 
-  client.search = sinon.stub().returns(new Promise(function() {}));
+  client.search = sinon.stub().returns(new Promise(() => {}));
 
   helper.toggleRefine('categories', 'beers > IPA > Flying dog');
   helper.toggleRefine('categories', 'fruits');
@@ -120,9 +139,9 @@ test('hierarchical facets: toggleRefine behavior when different root level', fun
 
   helper.setQuery('a').search();
 
-  var call = client.search.getCall(0);
-  var queries = call.args[0];
-  var hitsQuery = queries[0];
+  const call = client.search.getCall(0);
+  const queries = call.args[0];
+  const hitsQuery = queries[0];
 
   t.deepEqual(
     hitsQuery.params.facets,

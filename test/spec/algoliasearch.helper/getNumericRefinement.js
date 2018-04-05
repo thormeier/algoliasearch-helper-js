@@ -1,14 +1,12 @@
-'use strict';
+const test = require('tape');
+const algoliaSearchHelper = require('../../../index.js');
 
-var test = require('tape');
-var algoliaSearchHelper = require('../../../index.js');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('getNumericRefinement with single value addNumericRefinement', function(t) {
-  var helper = algoliaSearchHelper(fakeClient, null);
+test('getNumericRefinement with single value addNumericRefinement', t => {
+  const helper = algoliaSearchHelper(fakeClient, null);
 
   helper.addNumericRefinement('attribute', '=', 0);
   helper.addNumericRefinement('attribute', '=', 34);
@@ -18,8 +16,8 @@ test('getNumericRefinement with single value addNumericRefinement', function(t) 
   t.end();
 });
 
-test('getNumericRefinement with multiple values addNumericRefinement', function(t) {
-  var helper = algoliaSearchHelper(fakeClient, null);
+test('getNumericRefinement with multiple values addNumericRefinement', t => {
+  const helper = algoliaSearchHelper(fakeClient, null);
 
   helper.addNumericRefinement('attribute', '=', [0, 34]);
 

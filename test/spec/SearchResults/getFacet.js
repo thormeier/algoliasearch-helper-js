@@ -1,21 +1,23 @@
-'use strict';
+const test = require('tape');
+const SearchResults = require('../../../src/SearchResults');
 
-var test = require('tape');
-var SearchResults = require('../../../src/SearchResults');
+test('getFacetByName should return a given facet be it disjunctive or conjunctive', t => {
+  const data = require('../search.testdata')();
 
-test('getFacetByName should return a given facet be it disjunctive or conjunctive', function(t) {
-  var data = require('../search.testdata')();
+  const result = new SearchResults(data.searchParams, data.response.results);
 
-  var result = new SearchResults(data.searchParams, data.response.results);
-
-  var cityFacet = result.getFacetByName('city');
+  const cityFacet = result.getFacetByName('city');
 
   t.equal(cityFacet.name, 'city', 'name');
-  t.deepEqual(cityFacet.data, {
-    'New York': 1,
-    'Paris': 3,
-    'San Francisco': 1
-  }, 'values');
+  t.deepEqual(
+    cityFacet.data,
+    {
+      'New York': 1,
+      Paris: 3,
+      'San Francisco': 1,
+    },
+    'values'
+  );
 
   t.end();
 });

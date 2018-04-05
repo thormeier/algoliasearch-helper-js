@@ -1,21 +1,19 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+const SearchResults = require('../../../src/SearchResults');
+const SearchParameters = require('../../../src/SearchParameters');
 
-var SearchResults = require('../../../src/SearchResults');
-var SearchParameters = require('../../../src/SearchParameters');
+test('getFacetValues(facetName) returns a list of values using the defaults', t => {
+  const data = require('./getFacetValues/disjunctive.json');
+  const searchParams = new SearchParameters(data.state);
+  const result = new SearchResults(searchParams, data.content.results);
 
-test('getFacetValues(facetName) returns a list of values using the defaults', function(t) {
-  var data = require('./getFacetValues/disjunctive.json');
-  var searchParams = new SearchParameters(data.state);
-  var result = new SearchResults(searchParams, data.content.results);
+  const facetValues = result.getFacetValues('brand');
 
-  var facetValues = result.getFacetValues('brand');
-
-  var expected = [
-    {count: 386, isRefined: true, name: 'Apple'},
-    {count: 551, isRefined: false, name: 'Insignia™'},
-    {count: 511, isRefined: false, name: 'Samsung'}
+  const expected = [
+    { count: 386, isRefined: true, name: 'Apple' },
+    { count: 551, isRefined: false, name: 'Insignia™' },
+    { count: 511, isRefined: false, name: 'Samsung' },
   ];
 
   t.deepEqual(facetValues, expected);
@@ -23,37 +21,17 @@ test('getFacetValues(facetName) returns a list of values using the defaults', fu
   t.end();
 });
 
-test(
-  'getFacetValues(facetName) when no order is specified for isRefined the order is descending',
-  function(t) {
-    var data = require('./getFacetValues/disjunctive.json');
-    var searchParams = new SearchParameters(data.state);
-    var result = new SearchResults(searchParams, data.content.results);
+test('getFacetValues(facetName) when no order is specified for isRefined the order is descending', t => {
+  const data = require('./getFacetValues/disjunctive.json');
+  const searchParams = new SearchParameters(data.state);
+  const result = new SearchResults(searchParams, data.content.results);
 
-    var facetValues = result.getFacetValues('brand', {
-      sortBy: ['isRefined']
-    });
-
-    var expected = result.getFacetValues('brand', {
-      sortBy: ['isRefined:desc']
-    });
-
-    t.deepEqual(facetValues, expected);
-
-    t.end();
+  const facetValues = result.getFacetValues('brand', {
+    sortBy: ['isRefined'],
   });
 
-test('getFacetValues(facetName) when no order is specified for count the order is descending', function(t) {
-  var data = require('./getFacetValues/disjunctive.json');
-  var searchParams = new SearchParameters(data.state);
-  var result = new SearchResults(searchParams, data.content.results);
-
-  var facetValues = result.getFacetValues('brand', {
-    sortBy: ['count']
-  });
-
-  var expected = result.getFacetValues('brand', {
-    sortBy: ['count:desc']
+  const expected = result.getFacetValues('brand', {
+    sortBy: ['isRefined:desc'],
   });
 
   t.deepEqual(facetValues, expected);
@@ -61,17 +39,17 @@ test('getFacetValues(facetName) when no order is specified for count the order i
   t.end();
 });
 
-test('getFacetValues(facetName) when no order is specified for name the order is ascending', function(t) {
-  var data = require('./getFacetValues/disjunctive.json');
-  var searchParams = new SearchParameters(data.state);
-  var result = new SearchResults(searchParams, data.content.results);
+test('getFacetValues(facetName) when no order is specified for count the order is descending', t => {
+  const data = require('./getFacetValues/disjunctive.json');
+  const searchParams = new SearchParameters(data.state);
+  const result = new SearchResults(searchParams, data.content.results);
 
-  var facetValues = result.getFacetValues('brand', {
-    sortBy: ['name']
+  const facetValues = result.getFacetValues('brand', {
+    sortBy: ['count'],
   });
 
-  var expected = result.getFacetValues('brand', {
-    sortBy: ['name:asc']
+  const expected = result.getFacetValues('brand', {
+    sortBy: ['count:desc'],
   });
 
   t.deepEqual(facetValues, expected);
@@ -79,21 +57,35 @@ test('getFacetValues(facetName) when no order is specified for name the order is
   t.end();
 });
 
-test('getFacetValues(facetName) testing the sort function', function(t) {
-  var data = require('./getFacetValues/disjunctive.json');
-  var searchParams = new SearchParameters(data.state);
-  var result = new SearchResults(searchParams, data.content.results);
+test('getFacetValues(facetName) when no order is specified for name the order is ascending', t => {
+  const data = require('./getFacetValues/disjunctive.json');
+  const searchParams = new SearchParameters(data.state);
+  const result = new SearchResults(searchParams, data.content.results);
 
-  var facetValues = result.getFacetValues('brand', {
-    sortBy: function(a, b) {
-      if (a.count === b.count) return 0;
-      if (a.count > b.count)   return 1;
-      if (b.count > a.count)   return -1;
-    }
+  const facetValues = result.getFacetValues('brand', {
+    sortBy: ['name'],
   });
 
-  var expected = result.getFacetValues('brand', {
-    sortBy: ['count:asc']
+  const expected = result.getFacetValues('brand', {
+    sortBy: ['name:asc'],
+  });
+
+  t.deepEqual(facetValues, expected);
+
+  t.end();
+});
+
+test('getFacetValues(facetName) testing the sort function', t => {
+  const data = require('./getFacetValues/disjunctive.json');
+  const searchParams = new SearchParameters(data.state);
+  const result = new SearchResults(searchParams, data.content.results);
+
+  const facetValues = result.getFacetValues('brand', {
+    sortBy: (a, b) => a.count - b.count,
+  });
+
+  const expected = result.getFacetValues('brand', {
+    sortBy: ['count:asc'],
   });
 
   t.deepEqual(facetValues, expected);

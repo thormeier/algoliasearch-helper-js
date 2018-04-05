@@ -1,19 +1,19 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+const SearchParameters = require('../../../src/SearchParameters');
 
-var SearchParameters = require('../../../src/SearchParameters');
-
-test('addFacet should add a facet to the facets list', function(t) {
-  var state = SearchParameters.make({}).addFacet('facet');
+test('addFacet should add a facet to the facets list', t => {
+  const state = SearchParameters.make({}).addFacet('facet');
 
   t.deepEquals(state.facets, ['facet']);
 
   t.end();
 });
 
-test('removeFacet should remove a facet from the facets list', function(t) {
-  var state = SearchParameters.make({}).addFacet('facet').removeFacet('facet');
+test('removeFacet should remove a facet from the facets list', t => {
+  let state = SearchParameters.make({})
+    .addFacet('facet')
+    .removeFacet('facet');
 
   t.deepEquals(state.facets, []);
 
@@ -27,16 +27,16 @@ test('removeFacet should remove a facet from the facets list', function(t) {
   t.end();
 });
 
-test('addDisjunctiveFacet should add a facet to the disjunctiveFacets list', function(t) {
-  var state = SearchParameters.make({}).addDisjunctiveFacet('facet');
+test('addDisjunctiveFacet should add a facet to the disjunctiveFacets list', t => {
+  const state = SearchParameters.make({}).addDisjunctiveFacet('facet');
 
   t.deepEquals(state.disjunctiveFacets, ['facet']);
 
   t.end();
 });
 
-test('removeDisjunctiveFacet should remove a facet from the disjunctiveFacets list', function(t) {
-  var state = SearchParameters.make({})
+test('removeDisjunctiveFacet should remove a facet from the disjunctiveFacets list', t => {
+  let state = SearchParameters.make({})
     .addDisjunctiveFacet('facet')
     .removeDisjunctiveFacet('facet');
 
@@ -52,33 +52,35 @@ test('removeDisjunctiveFacet should remove a facet from the disjunctiveFacets li
   t.end();
 });
 
-test('addHierarchicalFacet should add a facet to the hierarchicalFacets list', function(t) {
-  var state = SearchParameters.make({}).addHierarchicalFacet({name: 'facet'});
+test('addHierarchicalFacet should add a facet to the hierarchicalFacets list', t => {
+  const state = SearchParameters.make({}).addHierarchicalFacet({
+    name: 'facet',
+  });
 
-  t.deepEquals(state.hierarchicalFacets, [{name: 'facet'}]);
+  t.deepEquals(state.hierarchicalFacets, [{ name: 'facet' }]);
 
   t.end();
 });
 
-test('addHierarchicalFacet should throw when a facet with the same name is already declared', function(t) {
-  t.throws(function() {
-    SearchParameters
-      .make({hierarchicalFacets: [{name: 'facet'}]})
-      .addHierarchicalFacet({name: 'facet'});
+test('addHierarchicalFacet should throw when a facet with the same name is already declared', t => {
+  t.throws(() => {
+    SearchParameters.make({
+      hierarchicalFacets: [{ name: 'facet' }],
+    }).addHierarchicalFacet({ name: 'facet' });
   });
 
   t.end();
 });
 
-test('removeHierarchicalFacet should remove a facet from the hierarchicalFacets list', function(t) {
-  var state = SearchParameters.make({})
-    .addHierarchicalFacet({name: 'facet'})
+test('removeHierarchicalFacet should remove a facet from the hierarchicalFacets list', t => {
+  let state = SearchParameters.make({})
+    .addHierarchicalFacet({ name: 'facet' })
     .removeHierarchicalFacet('facet');
 
   t.deepEquals(state.hierarchicalFacets, []);
 
   state = SearchParameters.make({})
-    .addHierarchicalFacet({name: 'facet'})
+    .addHierarchicalFacet({ name: 'facet' })
     .toggleHierarchicalFacetRefinement('facet', 'value')
     .removeHierarchicalFacet('facet');
 

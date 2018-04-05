@@ -8,18 +8,22 @@ import startsWith from 'lodash/startsWith';
  * @return {array.<string[]>} array containing 2 elements : attributes, orders
  */
 export default function formatSort(sortBy, defaults) {
-  return reduce(sortBy, function preparePredicate(out, sortInstruction) {
-    var sortInstructions = sortInstruction.split(':');
-    if (defaults && sortInstructions.length === 1) {
-      var similarDefault = find(defaults, function(predicate) {
-        return startsWith(predicate, sortInstruction[0]);
-      });
-      if (similarDefault) {
-        sortInstructions = similarDefault.split(':');
+  return reduce(
+    sortBy,
+    (out, sortInstruction) => {
+      let sortInstructions = sortInstruction.split(':');
+      if (defaults && sortInstructions.length === 1) {
+        const similarDefault = find(defaults, predicate =>
+          startsWith(predicate, sortInstruction[0])
+        );
+        if (similarDefault) {
+          sortInstructions = similarDefault.split(':');
+        }
       }
-    }
-    out[0].push(sortInstructions[0]);
-    out[1].push(sortInstructions[1]);
-    return out;
-  }, [[], []]);
-};
+      out[0].push(sortInstructions[0]);
+      out[1].push(sortInstructions[1]);
+      return out;
+    },
+    [[], []]
+  );
+}

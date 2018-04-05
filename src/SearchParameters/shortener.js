@@ -1,7 +1,7 @@
 import invert from 'lodash/invert';
 import keys from 'lodash/keys';
 
-var keys2Short = {
+const keys2Short = {
   advancedSyntax: 'aS',
   allowTyposOnNumericTokens: 'aTONT',
   analyticsTags: 'aT',
@@ -53,10 +53,10 @@ var keys2Short = {
   optionalFacetFilters: 'oFF',
   snippetEllipsisText: 'sET',
   disableExactOnAttributes: 'dEOA',
-  enableExactOnSingleWordQuery: 'eEOSWQ'
+  enableExactOnSingleWordQuery: 'eEOSWQ',
 };
 
-var short2Keys = invert(keys2Short);
+const short2Keys = invert(keys2Short);
 
 export default {
   /**
@@ -69,7 +69,7 @@ export default {
    * @param {string} shortKey the shorten attribute
    * @return {string} the decoded attribute, undefined otherwise
    */
-  decode: function(shortKey) {
+  decode(shortKey) {
     return short2Keys[shortKey];
   },
   /**
@@ -77,7 +77,7 @@ export default {
    * @param {string} key the attribute
    * @return {string} the shorten attribute
    */
-  encode: function(key) {
+  encode(key) {
     return keys2Short[key];
-  }
+  },
 };

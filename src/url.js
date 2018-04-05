@@ -33,9 +33,10 @@ function recursiveEncode(input) {
   }
   return input;
 }
+/* eslint-disable no-param-reassign */
 
-var refinementsParameters = ['dFR', 'fR', 'nR', 'hFR', 'tR'];
-var stateKeys = shortener.ENCODED_PARAMETERS;
+const refinementsParameters = ['dFR', 'fR', 'nR', 'hFR', 'tR'];
+const stateKeys = shortener.ENCODED_PARAMETERS;
 function sortQueryStringValues(prefixRegexp, invertedMapping, a, b) {
   if (prefixRegexp !== null) {
     a = a.replace(prefixRegexp, '');
@@ -49,8 +50,8 @@ function sortQueryStringValues(prefixRegexp, invertedMapping, a, b) {
     if (a === 'q') return -1;
     if (b === 'q') return 1;
 
-    var isARefinements = refinementsParameters.indexOf(a) !== -1;
-    var isBRefinements = refinementsParameters.indexOf(b) !== -1;
+    const isARefinements = refinementsParameters.indexOf(a) !== -1;
+    const isBRefinements = refinementsParameters.indexOf(b) !== -1;
     if (isARefinements && !isBRefinements) {
       return 1;
     } else if (isBRefinements && !isARefinements) {
@@ -71,24 +72,25 @@ function sortQueryStringValues(prefixRegexp, invertedMapping, a, b) {
  * @return {object} partial search parameters object (same properties than in the
  * SearchParameters but not exhaustive)
  */
-export var getStateFromQueryString = function(queryString, options) {
-  var prefixForParameters = options && options.prefix || '';
-  var mapping = options && options.mapping || {};
-  var invertedMapping = invert(mapping);
+export const getStateFromQueryString = function(queryString, options) {
+  const prefixForParameters = (options && options.prefix) || '';
+  const mapping = (options && options.mapping) || {};
+  const invertedMapping = invert(mapping);
 
-  var partialStateWithPrefix = qs.parse(queryString);
-  var prefixRegexp = new RegExp('^' + prefixForParameters);
-  var partialState = mapKeys(
-    partialStateWithPrefix,
-    function(v, k) {
-      var hasPrefix = prefixForParameters && prefixRegexp.test(k);
-      var unprefixedKey = hasPrefix ? k.replace(prefixRegexp, '') : k;
-      var decodedKey = shortener.decode(invertedMapping[unprefixedKey] || unprefixedKey);
-      return decodedKey || unprefixedKey;
-    }
+  const partialStateWithPrefix = qs.parse(queryString);
+  const prefixRegexp = new RegExp(`^${prefixForParameters}`);
+  const partialState = mapKeys(partialStateWithPrefix, (v, k) => {
+    const hasPrefix = prefixForParameters && prefixRegexp.test(k);
+    const unprefixedKey = hasPrefix ? k.replace(prefixRegexp, '') : k;
+    const decodedKey = shortener.decode(
+      invertedMapping[unprefixedKey] || unprefixedKey
+    );
+    return decodedKey || unprefixedKey;
+  });
+
+  const partialStateWithParsedNumbers = SearchParameters._parseNumbers(
+    partialState
   );
-
-  var partialStateWithParsedNumbers = SearchParameters._parseNumbers(partialState);
 
   return pick(partialStateWithParsedNumbers, SearchParameters.PARAMETERS);
 };
@@ -103,21 +105,25 @@ export var getStateFromQueryString = function(queryString, options) {
  * @return {object} the object containing the parsed configuration that doesn't
  * to the helper
  */
-export var getUnrecognizedParametersInQueryString = function(queryString, options) {
-  var prefixForParameters = options && options.prefix;
-  var mapping = options && options.mapping || {};
-  var invertedMapping = invert(mapping);
+export const getUnrecognizedParametersInQueryString = function(
+  queryString,
+  options
+) {
+  const prefixForParameters = options && options.prefix;
+  const mapping = (options && options.mapping) || {};
+  const invertedMapping = invert(mapping);
 
-  var foreignConfig = {};
-  var config = qs.parse(queryString);
+  const foreignConfig = {};
+  const config = qs.parse(queryString);
   if (prefixForParameters) {
-    var prefixRegexp = new RegExp('^' + prefixForParameters);
-    forEach(config, function(v, key) {
+    const prefixRegexp = new RegExp(`^${prefixForParameters}`);
+    forEach(config, (v, key) => {
       if (!prefixRegexp.test(key)) foreignConfig[key] = v;
     });
   } else {
-    forEach(config, function(v, key) {
-      if (!shortener.decode(invertedMapping[key] || key)) foreignConfig[key] = v;
+    forEach(config, (v, key) => {
+      if (!shortener.decode(invertedMapping[key] || key))
+        foreignConfig[key] = v;
     });
   }
 
@@ -137,31 +143,29 @@ export var getUnrecognizedParametersInQueryString = function(queryString, option
  *  Default to false for legacy reasons ()
  * @return {string} the query string
  */
-export var getQueryStringFromState = function(state, options) {
-  var moreAttributes = options && options.moreAttributes;
-  var prefixForParameters = options && options.prefix || '';
-  var mapping = options && options.mapping || {};
-  var safe = options && options.safe || false;
-  var invertedMapping = invert(mapping);
+export const getQueryStringFromState = function(state, options) {
+  const moreAttributes = options && options.moreAttributes;
+  const prefixForParameters = (options && options.prefix) || '';
+  const mapping = (options && options.mapping) || {};
+  const safe = (options && options.safe) || false;
+  const invertedMapping = invert(mapping);
 
-  var stateForUrl = safe ? state : recursiveEncode(state);
+  const stateForUrl = safe ? state : recursiveEncode(state);
 
-  var encodedState = mapKeys(
-    stateForUrl,
-    function(v, k) {
-      var shortK = shortener.encode(k);
-      return prefixForParameters + (mapping[shortK] || shortK);
-    }
-  );
+  const encodedState = mapKeys(stateForUrl, (v, k) => {
+    const shortK = shortener.encode(k);
+    return prefixForParameters + (mapping[shortK] || shortK);
+  });
 
-  var prefixRegexp = prefixForParameters === '' ? null : new RegExp('^' + prefixForParameters);
-  var sort = bind(sortQueryStringValues, null, prefixRegexp, invertedMapping);
+  const prefixRegexp =
+    prefixForParameters === '' ? null : new RegExp(`^${prefixForParameters}`);
+  const sort = bind(sortQueryStringValues, null, prefixRegexp, invertedMapping);
   if (!isEmpty(moreAttributes)) {
-    var stateQs = qs.stringify(encodedState, {encode: safe, sort: sort});
-    var moreQs = qs.stringify(moreAttributes, {encode: safe});
+    const stateQs = qs.stringify(encodedState, { encode: safe, sort });
+    const moreQs = qs.stringify(moreAttributes, { encode: safe });
     if (!stateQs) return moreQs;
-    return stateQs + '&' + moreQs;
+    return `${stateQs}&${moreQs}`;
   }
 
-  return qs.stringify(encodedState, {encode: safe, sort: sort});
+  return qs.stringify(encodedState, { encode: safe, sort });
 };

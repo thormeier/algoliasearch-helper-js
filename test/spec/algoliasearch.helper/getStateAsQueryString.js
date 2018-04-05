@@ -1,19 +1,19 @@
-'use strict';
+const test = require('tape');
+const algoliaSearchHelper = require('../../../index.js');
 
-var test = require('tape');
-var algoliaSearchHelper = require('../../../index.js');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('getStateAsQueryString', function(t) {
-  var helper = algoliaSearchHelper(fakeClient, 'fake index', {
+test('getStateAsQueryString', t => {
+  const helper = algoliaSearchHelper(fakeClient, 'fake index', {
     facets: ['color'],
-    hierarchicalFacets: [{
-      name: 'products',
-      attributes: ['categories.lvl0', 'categories.lvl1']
-    }]
+    hierarchicalFacets: [
+      {
+        name: 'products',
+        attributes: ['categories.lvl0', 'categories.lvl1'],
+      },
+    ],
   });
   helper.setQuery('hello mama');
   helper.toggleRefine('color', 'white');
@@ -26,19 +26,21 @@ test('getStateAsQueryString', function(t) {
   t.end();
 });
 
-test('getStateAsQueryString({safe: true})', function(t) {
-  var helper = algoliaSearchHelper(fakeClient, 'fake index', {
+test('getStateAsQueryString({safe: true})', t => {
+  const helper = algoliaSearchHelper(fakeClient, 'fake index', {
     facets: ['color'],
-    hierarchicalFacets: [{
-      name: 'products',
-      attributes: ['categories.lvl0', 'categories.lvl1']
-    }]
+    hierarchicalFacets: [
+      {
+        name: 'products',
+        attributes: ['categories.lvl0', 'categories.lvl1'],
+      },
+    ],
   });
   helper.setQuery('hello mama');
   helper.toggleRefine('color', 'white');
   helper.toggleRefine('products', 'fruits > bananas');
   t.equal(
-    helper.getStateAsQueryString({safe: true}),
+    helper.getStateAsQueryString({ safe: true }),
     'q=hello%20mama&fR%5Bcolor%5D%5B0%5D=white&hFR%5Bproducts%5D%5B0%5D=fruits%20%3E%20bananas'
   );
 

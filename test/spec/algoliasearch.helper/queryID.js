@@ -1,40 +1,47 @@
-'use strict';
+const test = require('tape');
+const algoliasearchHelper = require('../../../index');
 
-var test = require('tape');
-var algoliasearchHelper = require('../../../index');
-
-var fakeClient = {
-  addAlgoliaAgent: function() {}
+const fakeClient = {
+  addAlgoliaAgent() {},
 };
 
-test('the queryid should keep increasing when new requests arrives', function(t) {
-  var initialQueryID;
-  var client = {
-    addAlgoliaAgent: function() {},
-    search: function() {
+test('the queryid should keep increasing when new requests arrives', t => {
+  let initialQueryID;
+  const client = {
+    addAlgoliaAgent() {},
+    search() {
       initialQueryID++;
-      return new Promise(function() {});
-    }
+      return new Promise(() => {});
+    },
   };
-  var helper = algoliasearchHelper(client, null, {});
+  const helper = algoliasearchHelper(client, null, {});
 
   initialQueryID = helper._queryId;
 
-  helper.search().search().search().search().search();
+  helper
+    .search()
+    .search()
+    .search()
+    .search()
+    .search();
 
-  t.equal(helper._queryId, initialQueryID, 'the _queryID should have increased of the number of calls');
+  t.equal(
+    helper._queryId,
+    initialQueryID,
+    'the _queryID should have increased of the number of calls'
+  );
 
   t.end();
 });
 
-test('the response handler should check that the query is not outdated', function(t) {
-  var testData = require('../search.testdata')();
-  var shouldTriggerResult = true;
-  var callCount = 0;
+test('the response handler should check that the query is not outdated', t => {
+  const testData = require('../search.testdata')();
+  let shouldTriggerResult = true;
+  let callCount = 0;
 
-  var helper = algoliasearchHelper(fakeClient, null, {});
+  const helper = algoliasearchHelper(fakeClient, null, {});
 
-  helper.on('result', function() {
+  helper.on('result', () => {
     callCount++;
 
     if (!shouldTriggerResult) {
@@ -42,31 +49,45 @@ test('the response handler should check that the query is not outdated', functio
     }
   });
 
-  var states = [{
-    state: helper.state,
-    queriesCount: 1,
-    helper: helper
-  }];
+  const states = [
+    {
+      state: helper.state,
+      queriesCount: 1,
+      helper,
+    },
+  ];
 
-  helper._dispatchAlgoliaResponse(states, helper._lastQueryIdReceived + 1, testData.response);
-  helper._dispatchAlgoliaResponse(states, helper._lastQueryIdReceived + 10, testData.response);
+  helper._dispatchAlgoliaResponse(
+    states,
+    helper._lastQueryIdReceived + 1,
+    testData.response
+  );
+  helper._dispatchAlgoliaResponse(
+    states,
+    helper._lastQueryIdReceived + 10,
+    testData.response
+  );
   t.equal(callCount, 2, 'the callback should have been called twice');
 
   shouldTriggerResult = false;
 
-  helper._dispatchAlgoliaResponse(states, helper._lastQueryIdReceived - 1, testData.response);
+  helper._dispatchAlgoliaResponse(
+    states,
+    helper._lastQueryIdReceived - 1,
+    testData.response
+  );
   t.equal(callCount, 2, "and shouldn't have been called if outdated");
 
   t.end();
 });
 
-test('the error handler should check that the query is not outdated', function(t) {
-  var shouldTriggerError = true;
-  var callCount = 0;
+test('the error handler should check that the query is not outdated', t => {
+  let shouldTriggerError = true;
+  let callCount = 0;
 
-  var helper = algoliasearchHelper(fakeClient, null, {});
+  const helper = algoliasearchHelper(fakeClient, null, {});
 
-  helper.on('error', function() {
+  helper.on('error', () => {
     callCount++;
 
     if (!shouldTriggerError) {

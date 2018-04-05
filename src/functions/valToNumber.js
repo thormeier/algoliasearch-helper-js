@@ -12,5 +12,7 @@ export default function valToNumber(v) {
     return map(v, valToNumber);
   }
 
-  throw new Error('The value should be a number, a parseable string or an array of those.');
+  throw new Error(
+    'The value should be a number, a parseable string or an array of those.'
+  );
 }

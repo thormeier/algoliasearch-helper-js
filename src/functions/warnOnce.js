@@ -1,13 +1,15 @@
 import bind from 'lodash/bind';
 
+let warnOnce = function() {};
 try {
-  var warn;
+  let warn;
 
-  if (typeof window !== 'undefined') warn = window.console && bind(window.console.warn, console);
+  if (typeof window !== 'undefined')
+    warn = window.console && bind(window.console.warn, console);
   else warn = bind(console.warn, console); // eslint-disable-line no-console
 
-  var warnOnce = (function(w) {
-    var previousMessages = [];
+  warnOnce = (function(w) {
+    const previousMessages = [];
     return function warnOnlyOnce(m) {
       if (previousMessages.indexOf(m) === -1) {
         w(m);
@@ -19,4 +21,4 @@ try {
   warnOnce = function() {};
 }
 
-export default warnOnce
+export default warnOnce;

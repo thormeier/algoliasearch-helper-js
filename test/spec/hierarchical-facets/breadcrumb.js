@@ -1,22 +1,27 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+test('hierarchical facets: using getHierarchicalFacetBreadcrumb()', t => {
+  const algoliasearch = require('algoliasearch');
 
-test('hierarchical facets: using getHierarchicalFacetBreadcrumb()', function(t) {
-  var algoliasearch = require('algoliasearch');
+  const algoliasearchHelper = require('../../../');
 
-  var algoliasearchHelper = require('../../../');
+  const appId = 'hierarchical-simple-appId';
+  const apiKey = 'hierarchical-simple-apiKey';
+  const indexName = 'hierarchical-simple-indexName';
 
-  var appId = 'hierarchical-simple-appId';
-  var apiKey = 'hierarchical-simple-apiKey';
-  var indexName = 'hierarchical-simple-indexName';
-
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2', 'categories.lvl3']
-    }]
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: [
+          'categories.lvl0',
+          'categories.lvl1',
+          'categories.lvl2',
+          'categories.lvl3',
+        ],
+      },
+    ],
   });
 
   helper.toggleRefine('categories', 'beers > IPA > Flying dog');
@@ -30,21 +35,28 @@ test('hierarchical facets: using getHierarchicalFacetBreadcrumb()', function(t) 
   t.end();
 });
 
-test('hierarchical facets: using getHierarchicalFacetBreadcrumb before the first refinement', function(t) {
-  var algoliasearch = require('algoliasearch');
+test('hierarchical facets: using getHierarchicalFacetBreadcrumb before the first refinement', t => {
+  const algoliasearch = require('algoliasearch');
 
-  var algoliasearchHelper = require('../../../');
+  const algoliasearchHelper = require('../../../');
 
-  var appId = 'hierarchical-simple-appId';
-  var apiKey = 'hierarchical-simple-apiKey';
-  var indexName = 'hierarchical-simple-indexName';
+  const appId = 'hierarchical-simple-appId';
+  const apiKey = 'hierarchical-simple-apiKey';
+  const indexName = 'hierarchical-simple-indexName';
 
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {
-    hierarchicalFacets: [{
-      name: 'categories',
-      attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2', 'categories.lvl3']
-    }]
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {
+    hierarchicalFacets: [
+      {
+        name: 'categories',
+        attributes: [
+          'categories.lvl0',
+          'categories.lvl1',
+          'categories.lvl2',
+          'categories.lvl3',
+        ],
+      },
+    ],
   });
 
   t.deepEqual(
@@ -56,17 +68,17 @@ test('hierarchical facets: using getHierarchicalFacetBreadcrumb before the first
   t.end();
 });
 
-test('hierarchical facets: using getHierarchicalFacetBreadcrumb on an undefined facet', function(t) {
-  var algoliasearch = require('algoliasearch');
+test('hierarchical facets: using getHierarchicalFacetBreadcrumb on an undefined facet', t => {
+  const algoliasearch = require('algoliasearch');
 
-  var algoliasearchHelper = require('../../../');
+  const algoliasearchHelper = require('../../../');
 
-  var appId = 'hierarchical-simple-appId';
-  var apiKey = 'hierarchical-simple-apiKey';
-  var indexName = 'hierarchical-simple-indexName';
+  const appId = 'hierarchical-simple-appId';
+  const apiKey = 'hierarchical-simple-apiKey';
+  const indexName = 'hierarchical-simple-indexName';
 
-  var client = algoliasearch(appId, apiKey);
-  var helper = algoliasearchHelper(client, indexName, {});
+  const client = algoliasearch(appId, apiKey);
+  const helper = algoliasearchHelper(client, indexName, {});
 
   t.throws(
     helper.getHierarchicalFacetBreadcrumb.bind('categories'),

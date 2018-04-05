@@ -1,31 +1,24 @@
-'use strict';
+const test = require('tape');
 
-var test = require('tape');
+const algoliasearchHelper = require('../../../../index.js');
 
-var algoliasearchHelper = require('../../../../index.js');
-
-test('[Derivated helper] detach a derivative helper', function(t) {
-  var client = {
-    addAlgoliaAgent: function() {},
-    search: searchTest
+test('[Derivated helper] detach a derivative helper', t => {
+  const client = {
+    addAlgoliaAgent() {},
+    search: searchTest,
   };
-  var helper = algoliasearchHelper(client, '');
-  var derivedHelper = helper.derive(function(s) { return s; });
-  derivedHelper.on('result', function() {});
+  const helper = algoliasearchHelper(client, '');
+  const derivedHelper = helper.derive(s => s);
+  derivedHelper.on('result', () => {});
   helper.search();
   derivedHelper.detach();
   helper.search();
 
-
-  var nbRequest;
+  let nbRequest;
   function searchTest(requests) {
     nbRequest = nbRequest || 0;
     if (nbRequest === 0) {
-      t.equal(
-        requests.length,
-        2,
-        'the helper generates a two queries'
-      );
+      t.equal(requests.length, 2, 'the helper generates a two queries');
       t.deepEqual(
         requests[0],
         requests[1],
@@ -38,11 +31,7 @@ test('[Derivated helper] detach a derivative helper', function(t) {
       );
       nbRequest++;
     } else if (nbRequest === 1) {
-      t.equal(
-        requests.length,
-        1,
-        'the helper generates a two queries'
-      );
+      t.equal(requests.length, 1, 'the helper generates a two queries');
       t.equal(
         derivedHelper.listeners('result').length,
         0,
@@ -51,6 +40,6 @@ test('[Derivated helper] detach a derivative helper', function(t) {
       t.end();
     }
 
-    return new Promise(function() {});
+    return new Promise(() => {});
   }
 });
