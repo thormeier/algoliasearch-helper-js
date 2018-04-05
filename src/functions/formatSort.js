@@ -1,15 +1,13 @@
-'use strict';
-
-var reduce = require('lodash/reduce');
-var find = require('lodash/find');
-var startsWith = require('lodash/startsWith');
+import reduce from 'lodash/reduce';
+import find from 'lodash/find';
+import startsWith from 'lodash/startsWith';
 
 /**
  * Transform sort format from user friendly notation to lodash format
  * @param {string[]} sortBy array of predicate of the form "attribute:order"
  * @return {array.<string[]>} array containing 2 elements : attributes, orders
  */
-module.exports = function formatSort(sortBy, defaults) {
+export default function formatSort(sortBy, defaults) {
   return reduce(sortBy, function preparePredicate(out, sortInstruction) {
     var sortInstructions = sortInstruction.split(':');
     if (defaults && sortInstructions.length === 1) {

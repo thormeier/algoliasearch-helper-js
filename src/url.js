@@ -1,29 +1,25 @@
-'use strict';
-
 /**
  * Module containing the functions to serialize and deserialize
  * {SearchParameters} in the query string format
  * @module algoliasearchHelper.url
  */
 
-var shortener = require('./SearchParameters/shortener');
-var SearchParameters = require('./SearchParameters');
+import shortener from './SearchParameters/shortener';
 
-var qs = require('qs');
-
-var bind = require('lodash/bind');
-var forEach = require('lodash/forEach');
-var pick = require('lodash/pick');
-var map = require('lodash/map');
-var mapKeys = require('lodash/mapKeys');
-var mapValues = require('lodash/mapValues');
-var isString = require('lodash/isString');
-var isPlainObject = require('lodash/isPlainObject');
-var isArray = require('lodash/isArray');
-var isEmpty = require('lodash/isEmpty');
-var invert = require('lodash/invert');
-
-var encode = require('qs/lib/utils').encode;
+import SearchParameters from './SearchParameters';
+import qs from 'qs';
+import bind from 'lodash/bind';
+import forEach from 'lodash/forEach';
+import pick from 'lodash/pick';
+import map from 'lodash/map';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
+import isString from 'lodash/isString';
+import isPlainObject from 'lodash/isPlainObject';
+import isArray from 'lodash/isArray';
+import isEmpty from 'lodash/isEmpty';
+import invert from 'lodash/invert';
+import { encode } from 'qs/lib/utils';
 
 function recursiveEncode(input) {
   if (isPlainObject(input)) {
@@ -75,7 +71,7 @@ function sortQueryStringValues(prefixRegexp, invertedMapping, a, b) {
  * @return {object} partial search parameters object (same properties than in the
  * SearchParameters but not exhaustive)
  */
-exports.getStateFromQueryString = function(queryString, options) {
+export var getStateFromQueryString = function(queryString, options) {
   var prefixForParameters = options && options.prefix || '';
   var mapping = options && options.mapping || {};
   var invertedMapping = invert(mapping);
@@ -107,7 +103,7 @@ exports.getStateFromQueryString = function(queryString, options) {
  * @return {object} the object containing the parsed configuration that doesn't
  * to the helper
  */
-exports.getUnrecognizedParametersInQueryString = function(queryString, options) {
+export var getUnrecognizedParametersInQueryString = function(queryString, options) {
   var prefixForParameters = options && options.prefix;
   var mapping = options && options.mapping || {};
   var invertedMapping = invert(mapping);
@@ -141,7 +137,7 @@ exports.getUnrecognizedParametersInQueryString = function(queryString, options) 
  *  Default to false for legacy reasons ()
  * @return {string} the query string
  */
-exports.getQueryStringFromState = function(state, options) {
+export var getQueryStringFromState = function(state, options) {
   var moreAttributes = options && options.moreAttributes;
   var prefixForParameters = options && options.prefix || '';
   var mapping = options && options.mapping || {};

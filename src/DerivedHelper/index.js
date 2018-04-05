@@ -1,6 +1,5 @@
-'use strict';
-var util = require('util');
-var events = require('events');
+import util from 'util';
+import events from 'events';
 
 /**
  * A DerivedHelper is a way to create sub requests to
@@ -34,4 +33,4 @@ DerivedHelper.prototype.getModifiedState = function(parameters) {
   return this.fn(parameters);
 };
 
-module.exports = DerivedHelper;
+export default DerivedHelper;

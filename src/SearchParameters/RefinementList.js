@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Functions to manipulate refinement lists
  *
@@ -12,15 +10,16 @@
  * @typedef {Object.<string, SearchParameters.refinementList.Refinements>} SearchParameters.refinementList.RefinementList
  */
 
-var isUndefined = require('lodash/isUndefined');
-var isString = require('lodash/isString');
-var isFunction = require('lodash/isFunction');
-var isEmpty = require('lodash/isEmpty');
-var defaults = require('lodash/defaults');
+import isUndefined from 'lodash/isUndefined';
 
-var reduce = require('lodash/reduce');
-var filter = require('lodash/filter');
-var omit = require('lodash/omit');
+import isString from 'lodash/isString';
+import isFunction from 'lodash/isFunction';
+import isEmpty from 'lodash/isEmpty';
+import defaults from 'lodash/defaults';
+import reduce from 'lodash/reduce';
+import filter from 'lodash/filter';
+import omit from 'lodash/omit';
+import indexOf from 'lodash/indexOf';
 
 var lib = {
   /**
@@ -132,7 +131,6 @@ var lib = {
    * @return {boolean}
    */
   isRefined: function isRefined(refinementList, attribute, refinementValue) {
-    var indexOf = require('lodash/indexOf');
 
     var containsRefinements = !!refinementList[attribute] &&
       refinementList[attribute].length > 0;
@@ -147,4 +145,4 @@ var lib = {
   }
 };
 
-module.exports = lib;
+export default lib;

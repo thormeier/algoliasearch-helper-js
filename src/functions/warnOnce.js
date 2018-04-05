@@ -1,5 +1,4 @@
-'use strict';
-var bind = require('lodash/bind');
+import bind from 'lodash/bind';
 
 try {
   var warn;
@@ -16,8 +15,8 @@ try {
       }
     };
   })(warn);
-
-  module.exports = warnOnce;
 } catch (e) {
-  module.exports = function() {};
+  warnOnce = function() {};
 }
+
+export default warnOnce

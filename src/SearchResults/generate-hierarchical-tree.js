@@ -1,18 +1,13 @@
-'use strict';
+import last from 'lodash/last';
+import map from 'lodash/map';
+import reduce from 'lodash/reduce';
+import orderBy from 'lodash/orderBy';
+import trim from 'lodash/trim';
+import find from 'lodash/find';
+import pickBy from 'lodash/pickBy';
+import prepareHierarchicalFacetSortBy from '../functions/formatSort';
 
-module.exports = generateTrees;
-
-var last = require('lodash/last');
-var map = require('lodash/map');
-var reduce = require('lodash/reduce');
-var orderBy = require('lodash/orderBy');
-var trim = require('lodash/trim');
-var find = require('lodash/find');
-var pickBy = require('lodash/pickBy');
-
-var prepareHierarchicalFacetSortBy = require('../functions/formatSort');
-
-function generateTrees(state) {
+export default function generateTrees(state) {
   return function generate(hierarchicalFacetResult, hierarchicalFacetIndex) {
     var hierarchicalFacet = state.hierarchicalFacets[hierarchicalFacetIndex];
     var hierarchicalFacetRefinement = state.hierarchicalFacetsRefinements[hierarchicalFacet.name] &&

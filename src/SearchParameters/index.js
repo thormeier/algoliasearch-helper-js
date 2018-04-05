@@ -1,32 +1,26 @@
-'use strict';
-
-var keys = require('lodash/keys');
-var intersection = require('lodash/intersection');
-var forOwn = require('lodash/forOwn');
-var forEach = require('lodash/forEach');
-var filter = require('lodash/filter');
-var map = require('lodash/map');
-var reduce = require('lodash/reduce');
-var omit = require('lodash/omit');
-var indexOf = require('lodash/indexOf');
-var isNaN = require('lodash/isNaN');
-var isArray = require('lodash/isArray');
-var isEmpty = require('lodash/isEmpty');
-var isEqual = require('lodash/isEqual');
-var isUndefined = require('lodash/isUndefined');
-var isString = require('lodash/isString');
-var isFunction = require('lodash/isFunction');
-var find = require('lodash/find');
-var trim = require('lodash/trim');
-
-var defaults = require('lodash/defaults');
-var merge = require('lodash/merge');
-
-var valToNumber = require('../functions/valToNumber');
-
-var filterState = require('./filterState');
-
-var RefinementList = require('./RefinementList');
+import keys from 'lodash/keys';
+import intersection from 'lodash/intersection';
+import forOwn from 'lodash/forOwn';
+import forEach from 'lodash/forEach';
+import filter from 'lodash/filter';
+import map from 'lodash/map';
+import reduce from 'lodash/reduce';
+import omit from 'lodash/omit';
+import indexOf from 'lodash/indexOf';
+import isNaN from 'lodash/isNaN';
+import isArray from 'lodash/isArray';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import isUndefined from 'lodash/isUndefined';
+import isString from 'lodash/isString';
+import isFunction from 'lodash/isFunction';
+import find from 'lodash/find';
+import trim from 'lodash/trim';
+import defaults from 'lodash/defaults';
+import merge from 'lodash/merge';
+import valToNumber from '../functions/valToNumber';
+import filterState from './filterState';
+import RefinementList from './RefinementList';
 
 /**
  * like _.find but using _.isEqual to be able to use it
@@ -1720,4 +1714,4 @@ SearchParameters.prototype = {
  * depending on the type of facet
  * @return {boolean} `true` if the element should be removed. `false` otherwise.
  */
-module.exports = SearchParameters;
+export default SearchParameters;

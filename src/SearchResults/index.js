@@ -1,29 +1,21 @@
-'use strict';
-
-var forEach = require('lodash/forEach');
-var compact = require('lodash/compact');
-var indexOf = require('lodash/indexOf');
-var findIndex = require('lodash/findIndex');
-var get = require('lodash/get');
-
-var sumBy = require('lodash/sumBy');
-var find = require('lodash/find');
-var includes = require('lodash/includes');
-var map = require('lodash/map');
-var orderBy = require('lodash/orderBy');
-
-var defaults = require('lodash/defaults');
-var merge = require('lodash/merge');
-
-var isArray = require('lodash/isArray');
-var isFunction = require('lodash/isFunction');
-
-var partial = require('lodash/partial');
-var partialRight = require('lodash/partialRight');
-
-var formatSort = require('../functions/formatSort');
-
-var generateHierarchicalTree = require('./generate-hierarchical-tree');
+import forEach from 'lodash/forEach';
+import compact from 'lodash/compact';
+import indexOf from 'lodash/indexOf';
+import findIndex from 'lodash/findIndex';
+import get from 'lodash/get';
+import sumBy from 'lodash/sumBy';
+import find from 'lodash/find';
+import includes from 'lodash/includes';
+import map from 'lodash/map';
+import orderBy from 'lodash/orderBy';
+import defaults from 'lodash/defaults';
+import merge from 'lodash/merge';
+import isArray from 'lodash/isArray';
+import isFunction from 'lodash/isFunction';
+import partial from 'lodash/partial';
+import partialRight from 'lodash/partialRight';
+import formatSort from '../functions/formatSort';
+import generateHierarchicalTree from './generate-hierarchical-tree';
 
 /**
  * @typedef SearchResults.Facet
@@ -780,4 +772,4 @@ function getHierarchicalRefinement(state, attributeName, name, resultsFacets) {
   };
 }
 
-module.exports = SearchResults;
+export default SearchResults;

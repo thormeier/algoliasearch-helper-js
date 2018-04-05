@@ -1,10 +1,8 @@
-'use strict';
-
-var forEach = require('lodash/forEach');
-var map = require('lodash/map');
-var reduce = require('lodash/reduce');
-var merge = require('lodash/merge');
-var isArray = require('lodash/isArray');
+import forEach from 'lodash/forEach';
+import map from 'lodash/map';
+import reduce from 'lodash/reduce';
+import merge from 'lodash/merge';
+import isArray from 'lodash/isArray';
 
 var requestBuilder = {
   /**
@@ -308,4 +306,4 @@ var requestBuilder = {
   }
 };
 
-module.exports = requestBuilder;
+export default requestBuilder;

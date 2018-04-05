@@ -1,10 +1,9 @@
-'use strict';
+import map from 'lodash/map';
+import isArray from 'lodash/isArray';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
 
-var map = require('lodash/map');
-var isArray = require('lodash/isArray');
-var isNumber = require('lodash/isNumber');
-var isString = require('lodash/isString');
-function valToNumber(v) {
+export default function valToNumber(v) {
   if (isNumber(v)) {
     return v;
   } else if (isString(v)) {
@@ -15,5 +14,3 @@ function valToNumber(v) {
 
   throw new Error('The value should be a number, a parseable string or an array of those.');
 }
-
-module.exports = valToNumber;

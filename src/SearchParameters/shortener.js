@@ -1,7 +1,5 @@
-'use strict';
-
-var invert = require('lodash/invert');
-var keys = require('lodash/keys');
+import invert from 'lodash/invert';
+import keys from 'lodash/keys';
 
 var keys2Short = {
   advancedSyntax: 'aS',
@@ -60,7 +58,7 @@ var keys2Short = {
 
 var short2Keys = invert(keys2Short);
 
-module.exports = {
+export default {
   /**
    * All the keys of the state, encoded.
    * @const

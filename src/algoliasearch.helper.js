@@ -1,20 +1,15 @@
-'use strict';
-
-var SearchParameters = require('./SearchParameters');
-var SearchResults = require('./SearchResults');
-var DerivedHelper = require('./DerivedHelper');
-var requestBuilder = require('./requestBuilder');
-
-var util = require('util');
-var events = require('events');
-
-var flatten = require('lodash/flatten');
-var forEach = require('lodash/forEach');
-var isEmpty = require('lodash/isEmpty');
-var map = require('lodash/map');
-
-var url = require('./url');
-var version = require('./version');
+import SearchParameters from './SearchParameters';
+import SearchResults from './SearchResults';
+import DerivedHelper from './DerivedHelper';
+import requestBuilder from './requestBuilder';
+import util from 'util';
+import events from 'events';
+import flatten from 'lodash/flatten';
+import forEach from 'lodash/forEach';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import url from './url';
+import version from './version';
 
 /**
  * Event triggered when a parameter is set or updated
@@ -1403,4 +1398,4 @@ function doesClientAgentContainsHelper(client) {
     currentAgent.indexOf('JS Helper') !== -1;
 }
 
-module.exports = AlgoliaSearchHelper;
+export default AlgoliaSearchHelper;

@@ -1,10 +1,8 @@
-'use strict';
-
-var forEach = require('lodash/forEach');
-var filter = require('lodash/filter');
-var map = require('lodash/map');
-var isEmpty = require('lodash/isEmpty');
-var indexOf = require('lodash/indexOf');
+import forEach from 'lodash/forEach';
+import filter from 'lodash/filter';
+import map from 'lodash/map';
+import isEmpty from 'lodash/isEmpty';
+import indexOf from 'lodash/indexOf';
 
 function filterState(state, filters) {
   var partialState = {};
@@ -64,4 +62,4 @@ function filterState(state, filters) {
   return partialState;
 }
 
-module.exports = filterState;
+export default filterState;
